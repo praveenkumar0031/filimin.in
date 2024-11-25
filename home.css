@@ -1,0 +1,161 @@
+
+body{
+    background: url('yellowbg.png')no-repeat;
+    background-position: center;
+    background-size: cover;
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow: none;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    width: 100%;
+
+}
+
+.navbar
+{
+ width: 100%;
+ background-color: rgb(93, 61, 190) ;
+ overflow: none;
+ 
+ margin-top: -8;
+}
+
+
+.navbar a {
+ float: right;
+ text-align: center;
+ padding: 15px;
+ padding-left: 10px;
+ color: white;
+ text-decoration: none;
+ font-size: 23px;
+ margin-right: 15px;
+}
+
+.navbar a:hover {
+background-color:#400040;
+padding-top: 12px;
+border-radius: 20px;
+
+}
+
+.active {
+ background-color: blue;
+
+}
+@media screen and (max-width: 500px) {
+  
+ .navbar a {
+   float: none;
+   display: block;
+ }
+ .navbar
+{
+ width: 100%;
+ background-color: rgb(24, 24, 25) ;
+ overflow: none;
+ 
+ margin-top: -8;
+}
+
+
+.navbar a {
+ float: right;
+ text-align: center;
+ padding: 15px;
+ padding-left: 10px;
+ color: white;
+ text-decoration: none;
+ font-size: 23px;
+ margin-right: 15px;
+}
+
+.navbar a:hover {
+ background-color:green;
+ padding-top: 12px;
+}
+
+}
+a {
+  color: white;
+  opacity: 0.8;
+  text-decoration: none;
+  font-family: sans-serif;
+  font-weight: bold;
+  margin-top: 0.9rem;
+}
+.container{
+  display: flex;
+  align-items: left;
+  margin-top: 30px;
+}
+.front{
+  font-size: 150px;
+  font-family: fantasy;
+  padding-right: 20px;
+}
+.button{
+  margin: 50px;
+
+}
+.ABSTRACT{
+    align-items: center;
+    background-color:rgba(56, 4, 54, 0.614);
+    padding-bottom: 20px;
+    
+    text-align: center;
+
+}
+.head{
+  text-align: center;
+  margin: 25px 25px;
+  padding: 0%;
+  
+  font-size: 35px;
+  font-family: fantasy;
+  font-style: italic;
+}
+p{
+  font-family: fantasy;
+  font-style: italic;
+  font-size: 50px;
+  font-stretch: semi-condensed;
+}
+.foot{
+  background-color: black;
+  font-size: 35px;
+  font-family: fantasy;
+  color: white;
+  align-items: center;
+  padding-left: 550px;
+  height: 45PX;
+  
+}
+
+.img{
+  margin-left: 100px;
+  display:inline-flex;
+}
+.icon1{
+  display:inline-block;
+  margin-right: 200px;
+  margin-left: 130px;
+}
+
+  .icon2{
+    display:inline-block;
+    margin-right:200px;
+    margin-left: 115px;
+  }
+    .icon3{
+      display:inline-block;
+      margin-left: 90px;
+    }
+ion-icon{
+  height: 50px;
+  width: 50px;
+  margin-top: -35px;
+}
+

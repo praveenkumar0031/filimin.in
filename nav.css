@@ -1,0 +1,39 @@
+.nav{
+    display: inline-flex;
+    background-color: blueviolet;
+    height: 30px;
+    width: 70px;
+    padding-top: 5px;
+    margin-left: 6px;
+    padding-left: 20px;
+    color: white;
+    z-index: 1;
+}
+body{
+    background-image: url('stack.jpg')no-repeat;
+}
+.nav:active{
+    background-image: linear-gradient(pink,white);
+}
+.nav::after{
+    background-image: linear-gradient(yellow,white);
+}
+.nav:hover{
+    margin-top: 12px;    
+}
+.icon{
+    margin-top: -5;
+    margin-left: -2;
+}
+
+.nav-bar{
+    background-color: #78909c;
+    display: flex;
+    width: 100%;
+    margin-top: -10px;
+}
+body{
+    background: url('stack.jpg')no-repeat;
+    background-position: center;
+    background-size: cover;
+}
