@@ -1,0 +1,184 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: "Poppins", sans-serif;
+    box-sizing: border-box;
+}
+
+.box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    width: 100%;
+    background: url('stack.jpg') no-repeat center center/cover;
+}
+
+.outerbox {
+    position: relative;
+    width: 400px;
+    height: 450px;
+    background-color: transparent;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    display: flex;
+    border-radius: 25px;
+    justify-content: center;
+    align-items: center;
+}
+
+h1 {
+    text-align: center;
+    color: aliceblue;
+    margin-top: -50px;
+}
+
+.inbox {
+    position: relative;
+    margin: 30px 0;
+    width: 310px;
+    border-bottom: 2px solid #fff;
+}
+
+.inbox label {
+    position: absolute;
+    top: 50%;
+    left: 5px;
+    transform: translateY(-50%);
+    color: #fff;
+    pointer-events: none;
+    font-size: 1em;
+    padding: 0 35px 0 5px;
+    transition: 0.5s;
+}
+
+input:focus ~ label,
+input:valid ~ label {
+    top: -5px;
+}
+
+.inbox input {
+    width: 100%;
+    height: 50px;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 1em;
+    color: #fff;
+    cursor: grab;
+}
+
+.inbox ion-icon {
+    position: absolute;
+    right: 8px;
+    color: #fff;
+    font-size: 1.2em;
+    top: 20px;
+}
+
+a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.forgt:hover {
+    text-decoration: underline;
+}
+
+#reg {
+    width: 70%;
+    height: 40px;
+    margin-top: 20px;
+    margin-left: 50px;
+    border-radius: 40px;
+    border: none;
+    background-color: #fff;
+    outline: none;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 600;
+    transition: 0.3s ease;
+}
+
+#reg:hover {
+    background-color: #2874A6;
+    text-decoration: none;
+    width: 72%;
+    height: 45px;
+}
+
+.signin {
+    font-size: 0.9em;
+    color: #fff;
+    text-align: center;
+    margin: 25px 0 10px;
+}
+
+.signin p a {
+    text-decoration: none;
+    color: #fff;
+    font-weight: 600;
+}
+
+.signin a:hover {
+    text-decoration: underline;
+}
+
+.logo {
+    opacity: 0.7;
+    margin-top: 600px;
+    margin-left: 1200px;
+    position: fixed;
+}
+
+/* Responsive Design for Mobile Screens */
+@media screen and (max-width: 768px) {
+    .outerbox {
+        width: 90%;
+        height: auto;
+        padding: 20px;
+        border-radius: 20px;
+    }
+
+    h1 {
+        font-size: 1.5em;
+        margin-top: -30px;
+    }
+
+    .inbox {
+        width: 90%;
+        margin: 20px 0;
+    }
+
+    #reg {
+        margin-left: auto;
+        margin-right: auto;
+        width: 80%;
+    }
+
+    .logo {
+        display: none; /* Hide logo on small screens */
+    }
+}
+
+@media screen and (max-width: 480px) {
+    h1 {
+        font-size: 1.2em;
+        margin-top: -20px;
+    }
+
+    .outerbox {
+        padding: 15px;
+    }
+
+    .inbox label {
+        font-size: 0.9em;
+    }
+
+    #reg {
+        font-size: 0.9em;
+    }
+
+    .signin {
+        font-size: 0.8em;
+    }
+}

@@ -1,0 +1,37 @@
+.head{
+    text-align: center;
+    margin: 25px 25px;
+    padding: 0%;
+    font-size: 35px;
+    background-color:orange;
+    border: 5px solid red;
+}
+p{
+    font-size: 25px;
+    background-color: blue;
+    margin: 30px 30px;
+    padding: 15px 15px;
+    color: white;
+}
+iframe{
+    display: block;
+    align-items: center;
+    margin: auto;
+    height: 350px;
+    width: 650px;
+}
+img{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+}
+li,dl{
+    background-color: blue;
+}
+dd{
+    color: blanchedalmond;
+}
+body{
+    background-color:purple;
+}
