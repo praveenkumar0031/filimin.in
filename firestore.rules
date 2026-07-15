@@ -1,0 +1,59 @@
+// firestore.rules
+// Deploy with: firebase deploy --only firestore:rules
+//
+// Security model:
+//   - A user can only read/write their OWN document (request.auth.uid == userId)
+//   - highScore can only increase — a user cannot write a lower highScore than their current one
+//   - This is verified per-module in the validateScores() function
+//   - Structure is kept flat (single doc per user) to enable future leaderboard
+//     via a separate collection query without restructuring
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /users/{userId} {
+
+      // ── Read: only the authenticated owner ──────────────────────────────
+      allow read: if request.auth != null && request.auth.uid == userId;
+
+      // ── Create: owner only, on registration ─────────────────────────────
+      allow create: if request.auth != null
+                    && request.auth.uid == userId;
+
+      // ── Update: owner only + score integrity check ───────────────────────
+      allow update: if request.auth != null
+                    && request.auth.uid == userId
+                    && (
+                         // If scores field is NOT being changed, always allow
+                         !('scores' in request.resource.data)
+                         // If scores field IS being changed, validate it
+                         || validateScores(resource.data.scores, request.resource.data.scores)
+                       );
+
+      // ── Delete: disallowed ───────────────────────────────────────────────
+      allow delete: if false;
+
+      // ── Helper: ensure highScore never decreases for any module ──────────
+      function validateScores(existing, incoming) {
+        return
+          // budgeting
+          incoming.budgeting.highScore  >= existing.budgeting.highScore
+          // saving
+          && incoming.saving.highScore    >= existing.saving.highScore
+          // debt
+          && incoming.debt.highScore      >= existing.debt.highScore
+          // investing
+          && incoming.investing.highScore >= existing.investing.highScore
+          // taxes
+          && incoming.taxes.highScore     >= existing.taxes.highScore;
+      }
+    }
+
+    // All other collections — deny by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

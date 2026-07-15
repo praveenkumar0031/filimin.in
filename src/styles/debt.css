@@ -1,0 +1,61 @@
+/* src/styles/debt.css — Learn content pages (debt, credit, crypto, stocks, etc.) */
+
+body {
+  background-color: purple;
+  margin: 0;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.head {
+  text-align: center;
+  font-size: 35px;
+  background-color: orange;
+  border: 5px solid red;
+  margin: 25px;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+p {
+  font-size: 25px;
+  background-color: blue;
+  color: white;
+  margin: 30px;
+  padding: 15px;
+  border-radius: 6px;
+}
+
+iframe {
+  display: block;
+  margin: 20px auto;
+  width: 560px;
+  height: 315px;
+  border-radius: 8px;
+  max-width: 100%;
+}
+
+img {
+  display: block;
+  margin: 20px auto;
+  max-width: 100%;
+  border-radius: 8px;
+}
+
+li,
+dl {
+  background-color: blue;
+  color: white;
+  padding: 8px 15px;
+  margin: 5px 25px;
+  border-radius: 4px;
+}
+
+dd {
+  color: blanchedalmond;
+}
+
+ol {
+  margin: 0 30px;
+  padding: 0 20px;
+}
