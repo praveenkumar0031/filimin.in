@@ -43,12 +43,18 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.learn-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 10px 0px var(--color-void-dark);
+.learn-card.active {
+  border-color: var(--color-wealth);
+  box-shadow: 0px 6px 0px var(--color-wealth-shadow);
+  background-color: #FFFBE6;
+}
+
+.learn-card-emoji {
+  font-size: var(--text-4xl);
+  margin-bottom: var(--space-3);
+  line-height: 1;
 }
 
 .learn-card-title {

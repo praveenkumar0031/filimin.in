@@ -3,6 +3,7 @@ import { useUserScores } from '../hooks/useUserScores';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import DailyChallengeCard from '../components/DailyChallengeCard';
 import '../styles/dashboard.css';
 
 export default function DashboardPage() {
@@ -61,6 +62,9 @@ export default function DashboardPage() {
           <h1 className="dashboard-title">Player Portfolio</h1>
           <p className="dashboard-subtitle">&gt; USER: {user?.email || 'GUEST_001'}</p>
         </header>
+
+        {/* Daily Challenge */}
+        <DailyChallengeCard />
 
         {/* Top Stats - Chunky Arcade Cards */}
         <div className="stats-grid">

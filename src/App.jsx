@@ -19,21 +19,23 @@ import AboutPage     from './pages/AboutPage';
 import ContactPage   from './pages/ContactPage';
 import QuizHomePage  from './pages/QuizHomePage';
 import QuizPage      from './pages/QuizPage';
-import DashboardPage from './pages/DashboardPage';
-import ProfilePage   from './pages/ProfilePage';
-import LeaderboardPage from './pages/LeaderboardPage';
+import DashboardPage     from './pages/DashboardPage';
+import ProfilePage       from './pages/ProfilePage';
+import LeaderboardPage   from './pages/LeaderboardPage';
+import AchievementsPage  from './pages/AchievementsPage';
 
 // Learn sub-pages
-import StocksPage          from './pages/learn/StocksPage';
-import CryptoPage          from './pages/learn/CryptoPage';
-import DebtPage            from './pages/learn/DebtPage';
-import CreditPage          from './pages/learn/CreditPage';
-import AssetPage           from './pages/learn/AssetPage';
-import LoanPage            from './pages/learn/LoanPage';
-import TaxPage             from './pages/learn/TaxPage';
-import SimpleInterestPage  from './pages/learn/SimpleInterestPage';
+import StocksPage           from './pages/learn/StocksPage';
+import CryptoPage           from './pages/learn/CryptoPage';
+import DebtPage             from './pages/learn/DebtPage';
+import CreditPage           from './pages/learn/CreditPage';
+import AssetPage            from './pages/learn/AssetPage';
+import LoanPage             from './pages/learn/LoanPage';
+import TaxPage              from './pages/learn/TaxPage';
+import SimpleInterestPage   from './pages/learn/SimpleInterestPage';
 import CompoundInterestPage from './pages/learn/CompoundInterestPage';
-import LeveragePage        from './pages/learn/LeveragePage';
+import LeveragePage         from './pages/learn/LeveragePage';
+import TopicNotFound        from './pages/learn/TopicNotFound';
 
 export default function App() {
   return (
@@ -61,6 +63,8 @@ export default function App() {
           <Route path="/learn/simple-interest"   element={<SimpleInterestPage />} />
           <Route path="/learn/compound-interest" element={<CompoundInterestPage />} />
           <Route path="/learn/leverage"          element={<LeveragePage />} />
+          {/* Catch-all for invalid /learn/* routes */}
+          <Route path="/learn/*"                 element={<TopicNotFound />} />
 
           {/* ── Protected routes (auth required) ────────────────── */}
           <Route
@@ -100,6 +104,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <LeaderboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/achievements"
+            element={
+              <ProtectedRoute>
+                <AchievementsPage />
               </ProtectedRoute>
             }
           />

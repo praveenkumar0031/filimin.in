@@ -4,9 +4,10 @@ import { useAuth } from '../context/AuthContext';
 import { signOut } from 'firebase/auth';
 import { auth } from '../firebase';
 import { motion, AnimatePresence } from 'framer-motion';
+import NotificationBell from './NotificationBell';
 import '../styles/navbar.css';
 
-// SVG Icons to replace ion-icons
+// SVG Icons
 const MenuIcon = () => (
   <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
     <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -40,15 +41,16 @@ export default function Navbar() {
   const closeMenu = () => setIsMobileOpen(false);
 
   // Reusable list of links
-  const NavLinks = ({ isMobile }) => (
+  const NavLinks = () => (
     <>
       <Link to="/" onClick={closeMenu} className={`nav-item ${isActive('/')}`}>Home</Link>
       <Link to="/learn" onClick={closeMenu} className={`nav-item ${isActive('/learn')}`}>Learn</Link>
       <Link to="/quiz" onClick={closeMenu} className={`nav-item ${isActive('/quiz')}`}>Quests</Link>
       <Link to="/leaderboard" onClick={closeMenu} className={`nav-item ${isActive('/leaderboard')}`}>Leaderboard</Link>
-      
+
       {user ? (
         <>
+          <Link to="/achievements" onClick={closeMenu} className={`nav-item ${isActive('/achievements')}`}>Badges</Link>
           <Link to="/dashboard" onClick={closeMenu} className={`nav-item ${isActive('/dashboard')}`}>Dashboard</Link>
           <Link to="/profile" onClick={closeMenu} className={`nav-item ${isActive('/profile')}`}>Profile</Link>
           <button onClick={handleLogout} className="nav-item nav-action-btn">Logout</button>
@@ -61,7 +63,7 @@ export default function Navbar() {
 
   return (
     <>
-      <motion.nav 
+      <motion.nav
         className="navbar"
         initial={{ y: -100 }}
         animate={{ y: 0 }}
@@ -74,8 +76,15 @@ export default function Navbar() {
 
         {/* Desktop Menu */}
         <div className="nav-links-desktop">
-          <NavLinks isMobile={false} />
+          <NavLinks />
         </div>
+
+        {/* Notification Bell (desktop only) */}
+        {user && (
+          <div className="nav-bell-desktop">
+            <NotificationBell />
+          </div>
+        )}
 
         {/* Mobile Hamburger Toggle */}
         <button className="mobile-menu-btn" onClick={() => setIsMobileOpen(!isMobileOpen)}>
@@ -86,14 +95,14 @@ export default function Navbar() {
       {/* Mobile Full-Screen Drawer */}
       <AnimatePresence>
         {isMobileOpen && (
-          <motion.div 
+          <motion.div
             className="mobile-drawer"
             initial={{ opacity: 0, y: '-100%' }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: '-100%' }}
             transition={{ type: 'spring', stiffness: 150, damping: 25 }}
           >
-            <NavLinks isMobile={true} />
+            <NavLinks />
           </motion.div>
         )}
       </AnimatePresence>
