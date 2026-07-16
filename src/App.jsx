@@ -20,6 +20,8 @@ import ContactPage   from './pages/ContactPage';
 import QuizHomePage  from './pages/QuizHomePage';
 import QuizPage      from './pages/QuizPage';
 import DashboardPage from './pages/DashboardPage';
+import ProfilePage   from './pages/ProfilePage';
+import LeaderboardPage from './pages/LeaderboardPage';
 
 // Learn sub-pages
 import StocksPage          from './pages/learn/StocksPage';
@@ -82,6 +84,22 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/leaderboard"
+            element={
+              <ProtectedRoute>
+                <LeaderboardPage />
               </ProtectedRoute>
             }
           />

@@ -1,0 +1,95 @@
+/* src/styles/leaderboard.css */
+.leaderboard-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-8) var(--space-4);
+  min-height: calc(100vh - 80px);
+}
+
+.leaderboard-title {
+  font-family: var(--font-display);
+  font-size: var(--text-5xl);
+  color: var(--color-wealth);
+  text-transform: uppercase;
+  margin-bottom: var(--space-2);
+  text-shadow: 0 4px 0 var(--color-void-dark);
+}
+
+.leaderboard-subtitle {
+  font-family: var(--font-body);
+  color: var(--color-ink-light);
+  margin-bottom: var(--space-8);
+  font-size: var(--text-lg);
+}
+
+.leaderboard-card {
+  background-color: var(--color-surface);
+  border: 4px solid var(--color-void-dark);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 700px;
+  box-shadow: var(--shadow-arcade-md);
+  overflow: hidden;
+}
+
+.leaderboard-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.leaderboard-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-6);
+  border-bottom: 2px solid var(--color-void-dark);
+  background-color: var(--color-white);
+}
+
+.leaderboard-row:last-child {
+  border-bottom: none;
+}
+
+.leaderboard-row.current-user {
+  background-color: var(--color-growth);
+}
+
+.rank-col {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-black);
+  color: var(--color-void-dark);
+  width: 50px;
+}
+
+.name-col {
+  flex: 1;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  color: var(--color-ink);
+}
+
+.score-col {
+  font-family: var(--font-mono);
+  font-size: var(--text-xl);
+  color: var(--color-void-dark);
+  font-weight: var(--weight-bold);
+}
+
+/* Podium highlights */
+.leaderboard-row.rank-1 {
+  background-color: #FFF2C5; /* Light gold */
+}
+.leaderboard-row.rank-1 .rank-col { color: #D4AF37; } /* Gold */
+
+.leaderboard-row.rank-2 {
+  background-color: #F0F4F8; /* Light silver */
+}
+.leaderboard-row.rank-2 .rank-col { color: #C0C0C0; } /* Silver */
+
+.leaderboard-row.rank-3 {
+  background-color: #FFF0E6; /* Light bronze */
+}
+.leaderboard-row.rank-3 .rank-col { color: #CD7F32; } /* Bronze */

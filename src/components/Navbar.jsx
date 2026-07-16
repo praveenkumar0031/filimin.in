@@ -45,10 +45,12 @@ export default function Navbar() {
       <Link to="/" onClick={closeMenu} className={`nav-item ${isActive('/')}`}>Home</Link>
       <Link to="/learn" onClick={closeMenu} className={`nav-item ${isActive('/learn')}`}>Learn</Link>
       <Link to="/quiz" onClick={closeMenu} className={`nav-item ${isActive('/quiz')}`}>Quests</Link>
+      <Link to="/leaderboard" onClick={closeMenu} className={`nav-item ${isActive('/leaderboard')}`}>Leaderboard</Link>
       
       {user ? (
         <>
           <Link to="/dashboard" onClick={closeMenu} className={`nav-item ${isActive('/dashboard')}`}>Dashboard</Link>
+          <Link to="/profile" onClick={closeMenu} className={`nav-item ${isActive('/profile')}`}>Profile</Link>
           <button onClick={handleLogout} className="nav-item nav-action-btn">Logout</button>
         </>
       ) : (

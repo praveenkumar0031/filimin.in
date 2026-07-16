@@ -55,6 +55,7 @@ export async function createUserDocument(uid, displayName, email) {
       displayName,
       email,
       streak:         0,
+      totalScore:     0,
       lastActiveDate: serverTimestamp(),
       scores:         emptyScores(),
     },
@@ -88,6 +89,7 @@ export async function saveScore(uid, moduleKey, newScore) {
         displayName:    '',
         email:          '',
         streak:         0,
+        totalScore:     newScore,
         lastActiveDate: serverTimestamp(),
         scores:         {
           ...emptyScores(),
@@ -127,13 +129,23 @@ export async function saveScore(uid, moduleKey, newScore) {
     }
     // ─────────────────────────────────────────────────────────────────────
 
+    const updatedHighScore = newScore > existingScore.highScore ? newScore : existingScore.highScore;
+
+    let newTotalScore = 0;
+    MODULES.forEach((m) => {
+      if (m === moduleKey) {
+        newTotalScore += updatedHighScore;
+      } else {
+        newTotalScore += (data.scores?.[m]?.highScore || 0);
+      }
+    });
+
     tx.update(ref, {
       [`scores.${moduleKey}.attempts`]:   existingScore.attempts + 1,
       [`scores.${moduleKey}.lastPlayed`]: serverTimestamp(),
-      // Only update highScore if new score is higher
-      [`scores.${moduleKey}.highScore`]:
-        newScore > existingScore.highScore ? newScore : existingScore.highScore,
+      [`scores.${moduleKey}.highScore`]:  updatedHighScore,
       streak:         newStreak,
+      totalScore:     newTotalScore,
       lastActiveDate: serverTimestamp(),
     });
   });
