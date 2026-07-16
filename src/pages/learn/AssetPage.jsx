@@ -1,9 +1,15 @@
 // src/pages/learn/AssetPage.jsx
-import '../../styles/debt.css';
+import { Link } from 'react-router-dom';
+import Navbar from '../../components/Navbar';
+import '../../styles/learn.css';
 export default function AssetPage() {
   return (
     <>
-      <div className="head">
+      <Navbar />
+      <div className="article-container">
+        <Link to="/learn" className="btn-arcade" style={{ marginBottom: "2rem" }}>&larr; BACK TO MANUAL</Link>
+        <div className="article-content">
+          <div>
         <h2>What Is an Asset?</h2>
         <p>
           An asset is a resource with economic value that an individual, corporation, or country owns
@@ -12,7 +18,7 @@ export default function AssetPage() {
           benefit the firm&apos;s operations.
         </p>
       </div>
-      <div className="head">
+      <div>
         <h2>Types of Assets</h2>
         <dl>
           <dt>Current Assets</dt>
@@ -25,13 +31,16 @@ export default function AssetPage() {
           <dd>Non-physical assets with value (patents, trademarks, copyrights, goodwill).</dd>
         </dl>
       </div>
-      <img src="/asset.webp" alt="Types of assets" style={{ height: '300px' }} />
-      <iframe
+      <img src="/asset.webp" alt="Types of assets" className="article-image" />
+      <iframe className="article-video"
         src="https://www.youtube.com/embed/Ze3VospNcsI"
         title="What is an asset"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
       />
+    
+        </div>
+      </div>
     </>
   );
 }

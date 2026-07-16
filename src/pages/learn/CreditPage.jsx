@@ -1,9 +1,15 @@
 // src/pages/learn/CreditPage.jsx
-import '../../styles/debt.css';
+import { Link } from 'react-router-dom';
+import Navbar from '../../components/Navbar';
+import '../../styles/learn.css';
 export default function CreditPage() {
   return (
     <>
-      <div className="head">
+      <Navbar />
+      <div className="article-container">
+        <Link to="/learn" className="btn-arcade" style={{ marginBottom: "2rem" }}>&larr; BACK TO MANUAL</Link>
+        <div className="article-content">
+          <div>
         <h2>What Is Credit?</h2>
         <p>
           Credit is the ability to borrow money or access goods or services with the understanding
@@ -11,7 +17,7 @@ export default function CreditPage() {
           Good credit management is essential for financial health.
         </p>
       </div>
-      <div className="head">
+      <div>
         <h2>Key Credit Terms</h2>
         <ol>
           <li>Annual Fee — A yearly fee charged by a credit card issuer for use of the card.</li>
@@ -25,12 +31,15 @@ export default function CreditPage() {
           <li>Credit Bureau — Agencies (Equifax, Experian, TransUnion) that compile credit reports.</li>
         </ol>
       </div>
-      <iframe
+      <iframe className="article-video"
         src="https://www.youtube.com/embed/fTTGALaRZoc"
         title="Understanding credit"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
       />
+    
+        </div>
+      </div>
     </>
   );
 }

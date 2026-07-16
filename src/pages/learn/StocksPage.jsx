@@ -1,9 +1,15 @@
 // src/pages/learn/StocksPage.jsx
-import '../../styles/debt.css';
+import { Link } from 'react-router-dom';
+import Navbar from '../../components/Navbar';
+import '../../styles/learn.css';
 export default function StocksPage() {
   return (
     <>
-      <div className="head">
+      <Navbar />
+      <div className="article-container">
+        <Link to="/learn" className="btn-arcade" style={{ marginBottom: "2rem" }}>&larr; BACK TO MANUAL</Link>
+        <div className="article-content">
+          <div>
         <h2>What Are Stocks?</h2>
         <p>
           A stock (also known as equity) is a security that represents the ownership of a fraction of the
@@ -12,7 +18,7 @@ export default function StocksPage() {
           ownership type, fundamentals, price volatility, profit sharing, and economic trends.
         </p>
       </div>
-      <div className="head">
+      <div>
         <h2>Why Companies Issue Stocks</h2>
         <p>
           When a company issues stock, it is effectively selling a piece of itself in exchange for cash.
@@ -21,12 +27,15 @@ export default function StocksPage() {
           through rising stock prices and dividends.
         </p>
       </div>
-      <iframe
+      <iframe className="article-video"
         src="https://www.youtube.com/embed/2fLd4VQHKNg"
         title="What are stocks"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
       />
+    
+        </div>
+      </div>
     </>
   );
 }

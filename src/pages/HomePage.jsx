@@ -1,86 +1,75 @@
-// src/pages/HomePage.jsx
-// Mirrors home.html exactly: navbar, hero, ABSTRACT, team section, social links.
-
+import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import { motion } from 'framer-motion';
 import '../styles/home.css';
 
 export default function HomePage() {
   return (
     <>
       <Navbar />
+      
+      <main>
+        <section className="hero-section">
+          <motion.div 
+            className="hero-content"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <h1 className="hero-title">
+              Level Up Your <span className="highlight">Financial Mastery</span>
+            </h1>
+            <p className="hero-subtitle">
+              Embark on quests to master budgeting, investing, and wealth building. 
+              Earn your streak, grow your portfolio, and beat the system.
+            </p>
+            <div className="hero-cta">
+              <Link to="/register" className="btn-arcade primary">START PLAYING</Link>
+              <Link to="/learn" className="btn-arcade">READ THE MANUAL</Link>
+            </div>
+          </motion.div>
+        </section>
 
-      {/* Hero */}
-      <div className="container">
-        <div className="front" style={{ marginLeft: '45px' }}>
-          WELCOME <br />TO<br /> FILIM.IN
-        </div>
-        <div className="ig">
-          <img
-            src="/cryptography.png"
-            style={{ width: '550px', height: '450px', marginLeft: '50px', marginTop: '60px', borderRadius: '20px' }}
-            alt="Filimin hero"
-          />
-        </div>
-      </div>
+        <section className="features-section">
+          <div className="features-grid">
+            <motion.div 
+              className="feature-card"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+            >
+              <div className="feature-icon">🕹️</div>
+              <h3 className="feature-title">Arcade Quests</h3>
+              <p className="feature-desc">No boring lectures. Test your knowledge in rapid-fire scenarios that mimic real-world financial decisions.</p>
+            </motion.div>
 
-      <br /><br /><br />
+            <motion.div 
+              className="feature-card"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+            >
+              <div className="feature-icon">📈</div>
+              <h3 className="feature-title">Live Portfolio</h3>
+              <p className="feature-desc">Watch your high scores grow like a stock ticker. Build your streak and track your mastery over time.</p>
+            </motion.div>
 
-      {/* Abstract section */}
-      <div className="ABSTRACT">
-        <div className="head" style={{ fontSize: '55px', fontFamily: 'fantasy', paddingTop: '30px', color: 'white' }}>
-          FILIM.in
-        </div>
-        <p style={{ color: '#1DE9B6' }}>
-          Get Into The Universe Of Learning Financial Literacy
-        </p>
-        <br />
-        <p style={{ color: 'whitesmoke', fontFamily: 'fantasy' }}>WHY FILIM.IN</p>
-        <p style={{ color: '#1DE9B6', width: '1000px', marginLeft: '150px' }}>
-          OUR WEBSITE HELPS YOU TO LEARN THE FINANCIAL TERMS AND INVOKE YOUR KNOWLEDGE IN IT.
-        </p>
-      </div>
-
-      {/* Team section */}
-      <div>
-        <p className="foot">OUR TEAM</p>
-        <div className="img">
-          <img src="/Ar.jpg"     style={{ width: '150px', height: '150px', padding: '15px', borderRadius: '130px' }} alt="Rithin AR" />
-          <img src="/naveen.jpg" style={{ width: '150px', height: '150px', padding: '15px', borderRadius: '120px', marginLeft: '235px' }} alt="Naveen Kumar" />
-          <img src="/SPK.jpg"    style={{ width: '150px', height: '150px', padding: '15px', borderRadius: '130px', marginLeft: '215px' }} alt="Praveen Kumar S" />
-        </div>
-      </div>
-
-      <p style={{ display: 'inline-block', marginLeft: '80px',  marginTop: '20px' }}>DEVELOPER</p>
-      <p style={{ display: 'inline-block', marginLeft: '200px', marginTop: '20px' }}>DEVELOPER</p>
-      <p style={{ display: 'inline-block', marginLeft: '180px', marginTop: '20px' }}>DEVELOPER</p>
-
-      {/* Social links */}
-      <div className="logo">
-        <div className="icon1">
-          <a href="https://www.instagram.com/rith_in_8248/" target="_blank" rel="noreferrer">
-            <ion-icon name="logo-instagram"></ion-icon>
-          </a>
-          <a href="https://www.linkedin.com/in/naveen-kumar-663a14292" target="_blank" rel="noreferrer">
-            <ion-icon name="logo-linkedin"></ion-icon>
-          </a>
-        </div>
-        <div className="icon2">
-          <a href="https://www.instagram.com/_mr._unknown_27" target="_blank" rel="noreferrer">
-            <ion-icon name="logo-instagram"></ion-icon>
-          </a>
-          <a href="https://www.linkedin.com/in/rithin-rajavel-4a1825293" target="_blank" rel="noreferrer">
-            <ion-icon name="logo-linkedin"></ion-icon>
-          </a>
-        </div>
-        <div className="icon3">
-          <a href="https://www.instagram.com/intresting_31/" target="_blank" rel="noreferrer">
-            <ion-icon name="logo-instagram"></ion-icon>
-          </a>
-          <a href="https://www.linkedin.com/in/praveen-kumar-s-38b971288" target="_blank" rel="noreferrer">
-            <ion-icon name="logo-linkedin"></ion-icon>
-          </a>
-        </div>
-      </div>
+            <motion.div 
+              className="feature-card"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+            >
+              <div className="feature-icon">🛡️</div>
+              <h3 className="feature-title">Zero Risk</h3>
+              <p className="feature-desc">Learn how to manage debt, leverage, and compound interest before dealing with real money.</p>
+            </motion.div>
+          </div>
+        </section>
+      </main>
     </>
   );
 }

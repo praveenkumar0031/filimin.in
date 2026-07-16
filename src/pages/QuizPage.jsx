@@ -1,186 +1,217 @@
-// src/pages/QuizPage.jsx
-// Single generic quiz engine — replaces all 5 separate quiz HTML pages.
-// Driven by useParams() to get the module key, loads data from quizData.js.
-// React state replaces all DOM manipulation. Saves score to Firestore on finish.
-
-import { useState, useCallback } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { quizData } from '../data/quizData';
 import { useAuth } from '../context/AuthContext';
-import { QUIZ_META } from '../data/quizData';
-import { saveScore } from '../services/scoreService';
-import '../styles/quizstyle.css';
+import { saveScore as updateModuleScore } from '../services/scoreService';
+import { motion, AnimatePresence } from 'framer-motion';
+import Navbar from '../components/Navbar';
+import '../styles/quiz.css';
 
-const PASS_THRESHOLD = 6; // score > 5 = pass (matches original logic)
+// Animated Counter Component for the Ticker effect
+function AnimatedCounter({ value }) {
+  const [displayValue, setDisplayValue] = useState(value);
+
+  useEffect(() => {
+    let start = displayValue;
+    const end = value;
+    if (start === end) return;
+    
+    const duration = 500; // ms
+    const startTime = performance.now();
+    
+    const animate = (currentTime) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      // Easing out
+      const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+      const current = Math.floor(start + (end - start) * easeOutQuart);
+      
+      setDisplayValue(current);
+      
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        setDisplayValue(end);
+      }
+    };
+    
+    requestAnimationFrame(animate);
+  }, [value]);
+
+  return <span>{displayValue.toLocaleString()}</span>;
+}
 
 export default function QuizPage() {
   const { moduleKey } = useParams();
-  const navigate      = useNavigate();
-  const { user }      = useAuth();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  
+  const [questions, setQuestions] = useState([]);
+  const [currentIdx, setCurrentIdx] = useState(0);
+  const [score, setScore] = useState(0);
+  
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [isAnswered, setIsAnswered] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  
+  // Floating animation state
+  const [floatingScore, setFloatingScore] = useState(null);
 
-  // Find quiz metadata + questions by route param
-  const quiz = QUIZ_META.find((q) => q.key === moduleKey);
+  useEffect(() => {
+    if (quizData[moduleKey]) {
+      setQuestions(quizData[moduleKey]);
+    } else {
+      navigate('/quiz');
+    }
+  }, [moduleKey, navigate]);
 
-  // --- Guard: unknown quiz key ---
-  if (!quiz) {
-    return (
-      <div style={{ textAlign: 'center', padding: '60px', color: '#fff', background: '#001e4d', minHeight: '100vh' }}>
-        <h2>Quiz not found.</h2>
-        <Link to="/quiz" style={{ color: '#1DE9B6' }}>← Back to Quizzes</Link>
-      </div>
-    );
-  }
+  const handleOptionClick = (optionIdx, isCorrect, event) => {
+    if (isAnswered) return;
+    
+    setSelectedOption(optionIdx);
+    setIsAnswered(true);
 
-  const questions = quiz.data;
+    if (isCorrect) {
+      const rect = event.currentTarget.getBoundingClientRect();
+      // Set starting position for the floating score relative to viewport
+      setFloatingScore({
+        id: Date.now(),
+        x: rect.left + rect.width / 2,
+        y: rect.top,
+        amount: 100 // Points per question
+      });
+      
+      setScore(prev => prev + 100);
+    }
 
-  // --- State ---
-  const [currentIndex, setCurrentIndex]     = useState(0);
-  const [score,        setScore]            = useState(0);
-  const [result,       setResult]           = useState('');      // per-question feedback
-  const [answered,     setAnswered]         = useState(false);   // lock options after pick
-  const [selectedOpt,  setSelectedOpt]      = useState(null);
-  const [quizDone,     setQuizDone]         = useState(false);
-  const [saving,       setSaving]           = useState(false);
-
-  const currentQuestion = questions[currentIndex];
-  const progress = ((currentIndex) / questions.length) * 100;
-
-  // --- Answer handler (mirrors checkAnswer() from original JS) ---
-  const handleAnswer = useCallback(
-    async (option) => {
-      if (answered) return; // prevent double-click
-      setAnswered(true);
-      setSelectedOpt(option);
-
-      const isCorrect = option === currentQuestion.answer;
-      const newScore  = isCorrect ? score + 1 : score;
-
-      if (isCorrect) {
-        setResult('Correct answer!');
-      } else {
-        setResult(`Wrong answer! Correct answer: ${currentQuestion.answer}`);
+    setTimeout(() => {
+      setFloatingScore(null);
+      if (currentIdx + 1 < questions.length) {
+        setCurrentIdx(prev => prev + 1);
+        setSelectedOption(null);
+        setIsAnswered(false);
       }
-
-      // Short delay so the user sees the green/red color before advancing
-      setTimeout(async () => {
-        const nextIndex = currentIndex + 1;
-
-        if (nextIndex < questions.length) {
-          setCurrentIndex(nextIndex);
-          setAnswered(false);
-          setSelectedOpt(null);
-          setResult('');
-          setScore(newScore);
-        } else {
-          // Quiz done — save to Firestore
-          setScore(newScore);
-          setQuizDone(true);
-          if (user) {
-            setSaving(true);
-            try {
-              await saveScore(user.uid, moduleKey, newScore);
-            } catch (e) {
-              console.error('Score save failed:', e);
-            } finally {
-              setSaving(false);
-            }
-          }
-        }
-      }, 900);
-    },
-    [answered, currentIndex, currentQuestion, questions.length, score, user, moduleKey]
-  );
-
-  // --- Reset (Try Again) ---
-  const handleReset = () => {
-    setCurrentIndex(0);
-    setScore(0);
-    setResult('');
-    setAnswered(false);
-    setSelectedOpt(null);
-    setQuizDone(false);
+    }, 1500); // 1.5s delay to show result and float animation
   };
 
-  // --- Score screen (mirrors showScore() from original JS) ---
-  if (quizDone) {
-    const passed = score > PASS_THRESHOLD;
+  const isFinished = questions.length > 0 && currentIdx === questions.length - 1 && isAnswered;
+
+  useEffect(() => {
+    if (isFinished && user) {
+      const saveScore = async () => {
+        setIsSaving(true);
+        await updateModuleScore(user.uid, moduleKey, score);
+        setIsSaving(false);
+      };
+      saveScore();
+    }
+  }, [isFinished, user, moduleKey, score]);
+
+  if (questions.length === 0) return null;
+
+  const currentQuestion = questions[currentIdx];
+  const letters = ['A', 'B', 'C', 'D'];
+
+  if (isFinished) {
     return (
-      <div style={{ background: '#001e4d', minHeight: '100vh' }}>
-        <div className="quiz-container">
-          <h1>{quiz.label} QUIZ</h1>
-
-          <div id="question" style={{ fontSize: '20px', marginBottom: '20px' }}>
-            {passed
-              ? `CONGRATS YOU HAVE PASSED THE TEST .. CONTINUE FOR NEXT TEST ${score} OUT OF ${questions.length}`
-              : `You have scored less marks, please try again the quiz ${score} OUT OF ${questions.length}`
-            }
-          </div>
-
-          {saving && (
-            <div id="result" style={{ color: '#555', fontStyle: 'italic' }}>
-              Saving score...
-            </div>
-          )}
-
-          <div className="quiz-actions">
-            <button className="action-btn" onClick={handleReset}>TRY AGAIN</button>
-            <button className="action-btn" onClick={() => navigate(quiz.nextRoute)}>
-              {quiz.nextLabel.toUpperCase()}
+      <div className="quiz-layout">
+        <Navbar />
+        <div className="quiz-playfield">
+          <motion.div 
+            className="results-card"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', bounce: 0.5 }}
+          >
+            <h2>QUEST COMPLETE</h2>
+            <div className="ticker-label">Final Wealth</div>
+            <div className="results-score"><AnimatedCounter value={score} /></div>
+            
+            <button 
+              className="btn-arcade primary"
+              onClick={() => navigate('/dashboard')}
+              disabled={isSaving}
+              style={{ marginTop: '2rem' }}
+            >
+              {isSaving ? 'SAVING DATA...' : 'RETURN TO PORTFOLIO'}
             </button>
-          </div>
-        </div>
-
-        <div className="bottom">
-          <button className="backbut" onClick={() => navigate('/quiz')}>BACK TO QUIZZES</button>
+          </motion.div>
         </div>
       </div>
     );
   }
 
-  // --- Active quiz screen ---
   return (
-    <div style={{ background: '#001e4d', minHeight: '100vh' }}>
-      <div className="quiz-container">
-        <h1>{quiz.label} QUIZ</h1>
-
-        {/* Progress bar */}
-        <div className="progress-bar-container">
-          <div className="progress-bar" style={{ width: `${progress}%` }} />
+    <div className="quiz-layout">
+      {/* Navbar overlay for top nav */}
+      <Navbar />
+      
+      {/* Ticker Header */}
+      <div className="quiz-ticker">
+        <div>
+          <div className="ticker-label">Quest: {moduleKey.toUpperCase()}</div>
+          <div className="progress-fraction">Q {String(currentIdx + 1).padStart(2, '0')}/{String(questions.length).padStart(2, '0')}</div>
         </div>
-        <div className="question-counter">
-          Question {currentIndex + 1} of {questions.length}
+        <div style={{ textAlign: 'right' }}>
+          <div className="ticker-label">Score</div>
+          <div className="ticker-value"><AnimatedCounter value={score} /></div>
         </div>
-
-        {/* Question */}
-        <div id="question">
-          {currentIndex + 1}. {currentQuestion.question}
-        </div>
-
-        {/* Options */}
-        <div id="options" className="option-container">
-          {currentQuestion.options.map((option) => {
-            let btnClass = 'option-btn';
-            if (answered && option === currentQuestion.answer) btnClass += ' correct';
-            else if (answered && option === selectedOpt)       btnClass += ' wrong';
-
-            return (
-              <button
-                key={option}
-                className={btnClass}
-                onClick={() => handleAnswer(option)}
-                disabled={answered}
-              >
-                {option}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Per-question feedback */}
-        <div id="result">{result}</div>
       </div>
 
-      <div className="bottom">
-        <button className="backbut" onClick={() => navigate('/quiz')}>BACK TO QUIZZES</button>
+      {/* Playfield */}
+      <div className="quiz-playfield">
+        
+        {/* Floating Multiplier Drop */}
+        <AnimatePresence>
+          {floatingScore && (
+            <motion.div
+              className="floating-score"
+              initial={{ opacity: 1, y: floatingScore.y - 150, x: floatingScore.x - 20 }}
+              animate={{ opacity: 0, y: floatingScore.y - 250 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1, ease: "easeOut" }}
+            >
+              +{floatingScore.amount}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <motion.div 
+          key={currentIdx} // Animate on question change
+          initial={{ x: 50, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          exit={{ x: -50, opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+        >
+          <div className="question-card">
+            <h2 className="question-text">{currentQuestion.question}</h2>
+          </div>
+          
+          <div className="options-grid">
+            {currentQuestion.options.map((opt, idx) => {
+              const isCorrect = (idx === currentQuestion.answer);
+              let stateClass = '';
+              if (isAnswered) {
+                if (isCorrect) stateClass = 'correct';
+                else if (selectedOption === idx) stateClass = 'incorrect';
+              }
+
+              return (
+                <button
+                  key={idx}
+                  disabled={isAnswered}
+                  className={`option-btn ${stateClass}`}
+                  onClick={(e) => handleOptionClick(idx, isCorrect, e)}
+                >
+                  <div className="option-letter">{letters[idx]}</div>
+                  <div style={{ flex: 1 }}>{opt}</div>
+                </button>
+              );
+            })}
+          </div>
+        </motion.div>
       </div>
     </div>
   );

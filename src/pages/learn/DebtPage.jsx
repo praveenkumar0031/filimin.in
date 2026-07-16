@@ -1,9 +1,15 @@
 // src/pages/learn/DebtPage.jsx
-import '../../styles/debt.css';
+import { Link } from 'react-router-dom';
+import Navbar from '../../components/Navbar';
+import '../../styles/learn.css';
 export default function DebtPage() {
   return (
     <>
-      <div className="head">
+      <Navbar />
+      <div className="article-container">
+        <Link to="/learn" className="btn-arcade" style={{ marginBottom: "2rem" }}>&larr; BACK TO MANUAL</Link>
+        <div className="article-content">
+          <div>
         <h2>What Is Debt?</h2>
         <p>
           Debt is something, usually money, owed by one party to another. Many organizations use debt as
@@ -12,7 +18,7 @@ export default function DebtPage() {
           to be paid back at a later date, usually with interest.
         </p>
       </div>
-      <div className="head">
+      <div>
         <h2>How Debt Works:</h2>
         <ul>
           <li>Borrowing: You take out a loan or use a credit card, creating a debt.</li>
@@ -28,12 +34,15 @@ export default function DebtPage() {
           Negotiate with creditors for lower rates or settlements. Seek credit counseling if needed.
         </p>
       </div>
-      <iframe
+      <iframe className="article-video"
         src="https://www.youtube.com/embed/CHiOBzqcMV8"
         title="How to pay off debt"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
       />
+    
+        </div>
+      </div>
     </>
   );
 }

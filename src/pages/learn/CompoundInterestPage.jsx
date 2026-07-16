@@ -1,9 +1,15 @@
 // src/pages/learn/CompoundInterestPage.jsx
-import '../../styles/debt.css';
+import { Link } from 'react-router-dom';
+import Navbar from '../../components/Navbar';
+import '../../styles/learn.css';
 export default function CompoundInterestPage() {
   return (
     <>
-      <div className="head">
+      <Navbar />
+      <div className="article-container">
+        <Link to="/learn" className="btn-arcade" style={{ marginBottom: "2rem" }}>&larr; BACK TO MANUAL</Link>
+        <div className="article-content">
+          <div>
         <h2>Compound Interest</h2>
         <p>
           Compound interest is calculated on both the initial principal and the accumulated
@@ -20,7 +26,7 @@ export default function CompoundInterestPage() {
           loan amortization (depreciation of assets).
         </p>
       </div>
-      <div className="head">
+      <div>
         <h2>The Power of Compounding</h2>
         <p>
           Albert Einstein reportedly called compound interest the &quot;eighth wonder of the world.&quot;
@@ -29,12 +35,15 @@ export default function CompoundInterestPage() {
           can grow to substantial wealth over decades.
         </p>
       </div>
-      <iframe
+      <iframe className="article-video"
         src="https://www.youtube.com/embed/lNK95khKvSk"
         title="Compound interest explained"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
       />
+    
+        </div>
+      </div>
     </>
   );
 }

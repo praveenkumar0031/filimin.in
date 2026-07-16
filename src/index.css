@@ -1,5 +1,6 @@
-/* src/index.css — Global resets only. Page-specific styles live in src/styles/ */
+@import './styles/theme.css';
 
+/* Global Resets and Base Styles */
 *,
 *::before,
 *::after {
@@ -11,9 +12,107 @@ body,
 #root {
   margin: 0;
   padding: 0;
-  min-height: 100%;
+  min-height: 100vh;
 }
 
 body {
+  background-color: var(--color-void);
+  color: var(--color-white);
+  font-family: var(--font-body);
+  font-weight: var(--weight-medium);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+/* Base Typography Elements */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: var(--weight-black);
+  margin-top: 0;
+  margin-bottom: var(--space-4);
+  line-height: 1.2;
+}
+
+p {
+  margin-top: 0;
+  margin-bottom: var(--space-4);
+}
+
+a {
+  color: var(--color-wealth);
+  text-decoration: none;
+  font-weight: var(--weight-bold);
+  transition: color 0.2s ease;
+}
+
+a:hover, a:focus {
+  color: var(--color-wealth-hover);
+  outline: none;
+}
+
+/* Focus visibility for accessibility */
+:focus-visible {
+  outline: 3px solid var(--color-wealth);
+  outline-offset: 2px;
+}
+
+/* Utility classes */
+.font-mono {
+  font-family: var(--font-mono);
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.02em;
+}
+
+.text-wealth { color: var(--color-wealth); }
+.text-growth { color: var(--color-growth); }
+.text-risk { color: var(--color-risk); }
+
+/* Basic arcade button utility */
+.btn-arcade {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-surface);
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  text-transform: uppercase;
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: var(--space-3) var(--space-8);
+  font-size: var(--text-base);
+  cursor: pointer;
+  box-shadow: var(--shadow-arcade-md);
+  transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Minimum touch target */
+  min-height: 48px;
+}
+
+.btn-arcade:hover {
+  background-color: var(--color-surface-hover);
+  transform: translateY(2px);
+  box-shadow: 0px 4px 0px var(--color-void-dark);
+}
+
+.btn-arcade:active {
+  transform: var(--transform-pressed);
+  box-shadow: var(--shadow-pressed);
+}
+
+.btn-arcade.primary {
+  background-color: var(--color-wealth);
+  box-shadow: var(--shadow-arcade-wealth);
+}
+.btn-arcade.primary:hover {
+  background-color: var(--color-wealth-hover);
+  box-shadow: 0px 4px 0px var(--color-wealth-shadow);
+}
+
+.btn-arcade:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: translateY(4px);
+  box-shadow: none;
 }

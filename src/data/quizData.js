@@ -537,3 +537,11 @@ export const QUIZ_META = [
     nextLabel: 'View Dashboard',
   },
 ];
+
+export const quizData = {
+  budgeting: budgetingQuiz,
+  saving: savingQuiz,
+  debt: debtManagementQuiz,
+  investing: investingQuiz,
+  taxes: taxesQuiz,
+};

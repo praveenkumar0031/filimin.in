@@ -1,9 +1,15 @@
 // src/pages/learn/LeveragePage.jsx
-import '../../styles/debt.css';
+import { Link } from 'react-router-dom';
+import Navbar from '../../components/Navbar';
+import '../../styles/learn.css';
 export default function LeveragePage() {
   return (
     <>
-      <div className="head">
+      <Navbar />
+      <div className="article-container">
+        <Link to="/learn" className="btn-arcade" style={{ marginBottom: "2rem" }}>&larr; BACK TO MANUAL</Link>
+        <div className="article-content">
+          <div>
         <h2>What Is Leverage?</h2>
         <p>
           Leverage refers to using borrowed capital (debt) to increase the potential return of an
@@ -15,7 +21,7 @@ export default function LeveragePage() {
           falls below this, a margin call is issued.
         </p>
       </div>
-      <div className="head">
+      <div>
         <h2>Key Concepts</h2>
         <ul>
           <li><strong>Initial Margin</strong> — The minimum deposit required to open a leveraged position.</li>
@@ -24,13 +30,16 @@ export default function LeveragePage() {
           <li><strong>Risk</strong> — Leverage magnifies losses just as much as gains — use with caution.</li>
         </ul>
       </div>
-      <img src="/LEVER.png" alt="Leverage diagram" style={{ height: '300px' }} />
-      <iframe
+      <img src="/LEVER.png" alt="Leverage diagram" className="article-image" />
+      <iframe className="article-video"
         src="https://www.youtube.com/embed/GESzfA9odgE"
         title="What is leverage"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
       />
+    
+        </div>
+      </div>
     </>
   );
 }

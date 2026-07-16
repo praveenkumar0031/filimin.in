@@ -1,0 +1,131 @@
+/* src/styles/navbar.css - Comprehensive & Responsive */
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-8);
+  background-color: var(--color-ink);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 2px solid var(--color-void-dark);
+}
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  text-decoration: none;
+  z-index: 101; /* Stay above mobile menu */
+}
+
+.nav-logo img {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-pill);
+}
+
+.nav-brand {
+  font-family: var(--font-display);
+  font-weight: var(--weight-black);
+  font-size: var(--text-xl);
+  color: var(--color-white);
+  letter-spacing: 1px;
+}
+
+/* Desktop Links */
+.nav-links-desktop {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.nav-item {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-sm);
+  color: var(--color-surface);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.nav-item:hover {
+  background-color: var(--color-void);
+  color: var(--color-wealth);
+}
+
+.nav-item.active-link {
+  background-color: var(--color-void);
+  color: var(--color-growth);
+  box-shadow: 0 0 12px rgba(0, 240, 152, 0.15);
+}
+
+/* User Actions (Logout) */
+.nav-action-btn {
+  background: transparent;
+  border: 1px solid var(--color-risk);
+  color: var(--color-risk);
+  cursor: pointer;
+}
+.nav-action-btn:hover {
+  background: var(--color-risk);
+  color: var(--color-white);
+}
+
+/* Hamburger Icon */
+.mobile-menu-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  color: var(--color-white);
+  cursor: pointer;
+  z-index: 101;
+  padding: var(--space-2);
+}
+
+/* Mobile Drawer */
+.mobile-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--color-ink);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-6);
+  z-index: 100;
+  padding: var(--space-8);
+}
+
+.mobile-drawer .nav-item {
+  font-size: var(--text-2xl);
+  padding: var(--space-3) var(--space-6);
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 768px) {
+  .navbar {
+    padding: var(--space-3) var(--space-4);
+  }
+  
+  .nav-links-desktop {
+    display: none; /* Hide desktop links on small screens */
+  }
+  
+  .mobile-menu-btn {
+    display: flex; /* Show hamburger */
+    align-items: center;
+    justify-content: center;
+  }
+}

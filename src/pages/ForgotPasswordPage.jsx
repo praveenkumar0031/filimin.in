@@ -1,68 +1,75 @@
-// src/pages/ForgotPasswordPage.jsx
-// Mirrors forgot.html structure. Implements real Firebase sendPasswordResetEmail.
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../firebase';
-import '../styles/log.css';
-import '../styles/AR.css';
+import { motion } from 'framer-motion';
+import Navbar from '../components/Navbar';
+import '../styles/auth.css';
 
 export default function ForgotPasswordPage() {
-  const [email,   setEmail]   = useState('');
+  const [email, setEmail] = useState('');
+  const [error, setError] = useState('');
   const [message, setMessage] = useState('');
-  const [error,   setError]   = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleReset = async (e) => {
     e.preventDefault();
-    setError('');
-    setMessage('');
-    setLoading(true);
     try {
+      setMessage('');
+      setError('');
+      setLoading(true);
       await sendPasswordResetEmail(auth, email);
-      setMessage('Password reset email sent! Check your inbox.');
+      setMessage('RECOVERY LINK DISPATCHED. Check your inbox.');
     } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+      setError('FAILED TO SEND RECOVERY LINK.');
     }
+    setLoading(false);
   };
 
   return (
-    <div className="box">
-      <img className="logo-img" width="100" height="100" src="/icon.png" alt="logo" />
-      <div className="outerbox">
-        <div className="login-box">
-          <h1>RESET PASSWORD</h1>
+    <>
+      <Navbar />
+      <div className="auth-container">
+        <motion.div 
+          className="auth-card"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3 }}
+        >
+          <h2 className="auth-title">System Recovery</h2>
+          <p className="auth-subtitle">Enter your email to reset your passcode.</p>
+          
+          {error && <div className="auth-error">{error}</div>}
+          {message && <div className="auth-message">{message}</div>}
+          
+          <form className="auth-form" onSubmit={handleReset}>
+            <div className="input-group">
+              <label>Email Address</label>
+              <input
+                type="email"
+                className="auth-input"
+                placeholder="player@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            
+            <button 
+              type="submit" 
+              className="btn-arcade primary" 
+              disabled={loading}
+              style={{ marginTop: '1rem' }}
+            >
+              {loading ? 'SENDING...' : 'RESET PASSCODE'}
+            </button>
+          </form>
 
-          <div className="inbox">
-            <ion-icon name="mail-outline"></ion-icon>
-            <input
-              id="user"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-            <label htmlFor="user">EMAIL ADDRESS</label>
+          <div className="auth-links">
+            <div>Remembered it? <Link to="/login">Log in here</Link></div>
           </div>
-
-          {error   && <div className="auth-error">{error}</div>}
-          {message && <div className="auth-success">{message}</div>}
-
-          <button id="reg" onClick={handleReset} disabled={loading}>
-            {loading ? 'Sending...' : 'Reset'}
-          </button>
-
-          <div className="signin">
-            <p>
-              Remember it?&nbsp;
-              <Link to="/login">Back to Login</Link>
-            </p>
-          </div>
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </>
   );
 }

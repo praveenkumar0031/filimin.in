@@ -1,0 +1,96 @@
+/* src/styles/theme.css */
+/* 
+  Vivid Arcade Finance - Design Tokens 
+  One source of truth for the entire app's visual identity.
+*/
+
+:root {
+  /* =========================================
+     1. COLOR PALETTE
+     ========================================= */
+  /* The Void - High-energy deep blue-purple background */
+  --color-void: #2E1ED2;
+  --color-void-light: #4434E8; /* For hovers on dark backgrounds */
+  --color-void-dark: #1E1299;  /* For shadows */
+
+  /* The Surface - Paper/Cards */
+  --color-surface: #F4F2FF;
+  --color-surface-hover: #FFFFFF;
+
+  /* Accent - Wealth / Coins / Main CTA */
+  --color-wealth: #FFC700;
+  --color-wealth-hover: #FFD640;
+  --color-wealth-shadow: #CC9F00;
+
+  /* Positive - Growth / Correct / Progress */
+  --color-growth: #00F098;
+  --color-growth-hover: #26FFAD;
+  --color-growth-shadow: #00B371;
+
+  /* Negative - Risk / Debt / Incorrect */
+  --color-risk: #FF4B4B;
+  --color-risk-hover: #FF6E6E;
+  --color-risk-shadow: #CC3C3C;
+
+  /* Ink - Text on light surfaces (High Contrast) */
+  --color-ink: #090426;
+  --color-ink-light: #3D3960; /* Secondary text */
+
+  /* White - Text on dark surfaces */
+  --color-white: #FFFFFF;
+  --color-white-muted: rgba(255, 255, 255, 0.7);
+
+  /* =========================================
+     2. TYPOGRAPHY SYSTEM
+     ========================================= */
+  --font-display: 'Outfit', sans-serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+  --font-mono: 'Space Mono', monospace;
+
+  /* Type Scale */
+  --text-xs: 0.75rem;     /* 12px */
+  --text-sm: 0.875rem;    /* 14px */
+  --text-base: 1rem;      /* 16px */
+  --text-lg: 1.125rem;    /* 18px */
+  --text-xl: 1.25rem;     /* 20px */
+  --text-2xl: 1.5rem;     /* 24px */
+  --text-3xl: 2rem;       /* 32px */
+  --text-4xl: 2.5rem;     /* 40px */
+  --text-5xl: 3rem;       /* 48px */
+
+  /* Font Weights */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-bold: 700;
+  --weight-black: 900;
+
+  /* =========================================
+     3. SPACING & LAYOUT
+     ========================================= */
+  --space-1: 0.25rem;   /* 4px */
+  --space-2: 0.5rem;    /* 8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-8: 2rem;      /* 32px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --radius-pill: 9999px;
+
+  /* =========================================
+     4. SHADOWS (Chunky, Tactile Arcade Feel)
+     ========================================= */
+  --shadow-arcade-sm: 0px 4px 0px var(--color-void-dark);
+  --shadow-arcade-md: 0px 6px 0px var(--color-void-dark);
+  --shadow-arcade-wealth: 0px 6px 0px var(--color-wealth-shadow);
+  --shadow-arcade-growth: 0px 6px 0px var(--color-growth-shadow);
+  --shadow-arcade-risk: 0px 6px 0px var(--color-risk-shadow);
+  
+  /* Pressed states negate the shadow and translate the element down */
+  --transform-pressed: translateY(4px);
+  --shadow-pressed: 0px 0px 0px transparent;
+}

@@ -1,42 +1,46 @@
-// src/pages/LearnPage.jsx
-// Mirrors learn.html: animated glow cards linking to learn sub-pages.
-// External links open in new tab; internal topics use React Router Link.
-
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import { motion } from 'framer-motion';
 import '../styles/learn.css';
+
+const learnTopics = [
+  { path: 'stocks', title: 'Stocks', desc: 'Own a piece of the company.' },
+  { path: 'crypto', title: 'Crypto', desc: 'Digital decentralized currency.' },
+  { path: 'debt', title: 'Debt', desc: 'Borrowing money responsibly.' },
+  { path: 'credit', title: 'Credit', desc: 'Your financial reputation.' },
+  { path: 'asset', title: 'Assets', desc: 'Things that put money in your pocket.' },
+  { path: 'loan', title: 'Loans', desc: 'How borrowing actually works.' },
+  { path: 'tax', title: 'Taxes', desc: 'Funding public services.' },
+  { path: 'simple-interest', title: 'Simple Interest', desc: 'Linear financial growth.' },
+  { path: 'compound-interest', title: 'Compound Interest', desc: 'The 8th wonder of the world.' },
+  { path: 'leverage', title: 'Leverage', desc: 'Using debt to multiply returns.' },
+];
 
 export default function LearnPage() {
   return (
     <>
       <Navbar />
+      <div className="learn-container">
+        <header className="learn-header">
+          <h1 className="learn-title">The Manual</h1>
+          <p className="learn-subtitle">Read up on core concepts before tackling the quests.</p>
+        </header>
 
-      {/* Row 1 — 5 internal topic cards */}
-      <div className="overall">
-        <Link to="/learn/stocks"  className="card">STOCKS</Link>
-        <a href="https://www.investopedia.com/terms/f/funding.asp" target="_blank" rel="noreferrer" className="card">FUNDING</a>
-        <a href="https://www.investopedia.com/terms/t/trade.asp"   target="_blank" rel="noreferrer" className="card">TRADE</a>
-        <Link to="/learn/crypto"  className="card">CRYPTO</Link>
-        <Link to="/learn/debt"    className="card">DEBT</Link>
-      </div>
-
-      {/* Row 2 — 7 internal topic cards */}
-      <div className="overall">
-        <Link to="/learn/credit"            className="card">CREDIT</Link>
-        <Link to="/learn/loan"              className="card">LOAN</Link>
-        <Link to="/learn/compound-interest" className="card">COMPOUND INTEREST</Link>
-        <Link to="/learn/simple-interest"   className="card">SIMPLE INTEREST</Link>
-        <Link to="/learn/leverage"          className="card">LEVERAGE</Link>
-        <Link to="/learn/asset"             className="card">ASSET</Link>
-        <Link to="/learn/tax"               className="card">TAX</Link>
-      </div>
-
-      {/* Row 3 — external reference links */}
-      <div className="overall">
-        <a href="https://www.consumerfinance.gov/ask-cfpb/what-is-a-credit-score-en-315/" target="_blank" rel="noreferrer" className="card">CREDIT SCORE</a>
-        <a href="https://capital.com/monetary-value-definition"                            target="_blank" rel="noreferrer" className="card">MONEY VALUE</a>
-        <a href="https://corporatefinanceinstitute.com/resources/accounting/liquidity/"    target="_blank" rel="noreferrer" className="card">LIQUIDITY</a>
-        <a href="https://www.investopedia.com/terms/r/rateofreturn.asp"                    target="_blank" rel="noreferrer" className="card">RATE OF RETURN</a>
+        <div className="learn-grid">
+          {learnTopics.map((topic, idx) => (
+            <motion.Link 
+              to={`/learn/${topic.path}`} 
+              key={topic.path}
+              className="learn-card"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: idx * 0.05 }}
+            >
+              <h3 className="learn-card-title">{topic.title}</h3>
+              <p className="learn-card-desc">{topic.desc}</p>
+            </motion.Link>
+          ))}
+        </div>
       </div>
     </>
   );

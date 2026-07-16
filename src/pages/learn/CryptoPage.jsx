@@ -1,9 +1,15 @@
 // src/pages/learn/CryptoPage.jsx
-import '../../styles/debt.css';
+import { Link } from 'react-router-dom';
+import Navbar from '../../components/Navbar';
+import '../../styles/learn.css';
 export default function CryptoPage() {
   return (
     <>
-      <div className="head">
+      <Navbar />
+      <div className="article-container">
+        <Link to="/learn" className="btn-arcade" style={{ marginBottom: "2rem" }}>&larr; BACK TO MANUAL</Link>
+        <div className="article-content">
+          <div>
         <h2>What Is Cryptocurrency?</h2>
         <p>
           Cryptocurrency is a digital or virtual currency secured by cryptography, which makes it nearly
@@ -12,7 +18,7 @@ export default function CryptoPage() {
           Ethereum, Tether, Solana, Tezos, EOS, and ZCash.
         </p>
       </div>
-      <div className="head">
+      <div>
         <h2>How Blockchain Works</h2>
         <p>
           Cryptocurrencies run on a distributed public ledger called blockchain — a record of all
@@ -21,13 +27,16 @@ export default function CryptoPage() {
           peer-to-peer network without any central authority.
         </p>
       </div>
-      <img src="/cryptography.png" alt="Cryptography" style={{ height: '300px' }} />
-      <iframe
+      <img src="/cryptography.png" alt="Cryptography" className="article-image" />
+      <iframe className="article-video"
         src="https://www.youtube.com/embed/GQvu49c0ZZc"
         title="What is Cryptocurrency"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
       />
+    
+        </div>
+      </div>
     </>
   );
 }

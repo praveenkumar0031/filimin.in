@@ -1,158 +1,126 @@
-// src/pages/DashboardPage.jsx
-// Progress dashboard (Part 2 new feature).
-// Uses useUserScores() for real-time data. Styled to match the site's dark purple/teal palette.
-
-import { useNavigate, Link } from 'react-router-dom';
-import { signOut } from 'firebase/auth';
-import { auth } from '../firebase';
 import { useAuth } from '../context/AuthContext';
 import { useUserScores } from '../hooks/useUserScores';
+import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-import { QUIZ_META } from '../data/quizData';
 import '../styles/dashboard.css';
 
-const TOTAL_QUESTIONS = 10;
-
-// Format a Firestore Timestamp or null into a readable string
-function formatDate(ts) {
-  if (!ts) return 'Never';
-  const d = ts.toDate ? ts.toDate() : new Date(ts);
-  return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-}
-
-// Count how many modules have been attempted at least once
-function countCompleted(scores) {
-  if (!scores) return 0;
-  return QUIZ_META.filter((q) => (scores[q.key]?.attempts ?? 0) > 0).length;
-}
-
-// Sum of all highScores across modules
-function totalHighScore(scores) {
-  if (!scores) return 0;
-  return QUIZ_META.reduce((sum, q) => sum + (scores[q.key]?.highScore ?? 0), 0);
-}
-
 export default function DashboardPage() {
-  const navigate      = useNavigate();
-  const { user }      = useAuth();
-  const { scores, loading, error } = useUserScores(user?.uid);
-
-  const handleLogout = async () => {
-    await signOut(auth);
-    navigate('/login');
-  };
+  const { user } = useAuth();
+  const { scoreData, loading } = useUserScores(user?.uid);
 
   if (loading) {
     return (
-      <div className="dashboard-page">
+      <>
         <Navbar />
-        <div className="dashboard-loading">Loading your progress...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="dashboard-page">
-        <Navbar />
-        <div className="dashboard-content">
-          <p style={{ color: '#ff6b6b', textAlign: 'center' }}>
-            Failed to load scores. Please refresh.
-          </p>
+        <div className="dashboard-loading">
+          <motion.div 
+            animate={{ opacity: [0.5, 1, 0.5] }} 
+            transition={{ repeat: Infinity, duration: 1.5 }}
+          >
+            [ LOADING PORTFOLIO_DATA... ]
+          </motion.div>
         </div>
-      </div>
+      </>
     );
   }
 
-  const moduleScores  = scores?.scores ?? {};
-  const streak        = scores?.streak ?? 0;
-  const completed     = countCompleted(moduleScores);
-  const totalHS       = totalHighScore(moduleScores);
+  // Fallback to default structure if scoreData is null (e.g., brand new user without a db document yet)
+  const safeScoreData = scoreData || {
+    budgeting: { highScore: 0, attempts: 0 },
+    saving: { highScore: 0, attempts: 0 },
+    debt: { highScore: 0, attempts: 0 },
+    investing: { highScore: 0, attempts: 0 },
+    taxes: { highScore: 0, attempts: 0 },
+    currentStreak: 0,
+    totalQuestionsAnswered: 0
+  };
+
+  // Calculate some aggregate values for the progress bars
+  // Assuming a max possible score of 5000 per module for the visual bar (example scale)
+  const MAX_MODULE_SCORE = 5000;
+
+  const modules = [
+    { key: 'budgeting', name: 'Budgeting', data: safeScoreData.budgeting || { highScore: 0, attempts: 0 } },
+    { key: 'saving', name: 'Saving', data: safeScoreData.saving || { highScore: 0, attempts: 0 } },
+    { key: 'debt', name: 'Debt Management', data: safeScoreData.debt || { highScore: 0, attempts: 0 } },
+    { key: 'investing', name: 'Investing', data: safeScoreData.investing || { highScore: 0, attempts: 0 } },
+    { key: 'taxes', name: 'Taxes', data: safeScoreData.taxes || { highScore: 0, attempts: 0 } },
+  ];
 
   return (
-    <div className="dashboard-page">
+    <>
       <Navbar />
+      <motion.div 
+        className="dashboard-container"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <header className="dashboard-header">
+          <h1 className="dashboard-title">Player Portfolio</h1>
+          <p className="dashboard-subtitle">&gt; USER: {user?.email || 'GUEST_001'}</p>
+        </header>
 
-      <div className="dashboard-content">
-        {/* Header */}
-        <h1 className="dashboard-header">
-          📊 FILIM.IN — YOUR PROGRESS
-        </h1>
-        <p className="dashboard-subtitle">
-          Welcome back, {scores?.displayName || user?.displayName || user?.email || 'Player'}!
-        </p>
+        {/* Top Stats - Chunky Arcade Cards */}
+        <div className="stats-grid">
+          <motion.div 
+            className="stat-card streak"
+            whileHover={{ y: -5 }}
+          >
+            <div className="stat-label">Current Streak</div>
+            <div className="stat-value">{safeScoreData.currentStreak} 🔥</div>
+          </motion.div>
 
-        {/* Summary row */}
-        <div className="summary-row">
-          <div className="summary-card">
-            <div className="sc-value">🔥 {streak}</div>
-            <div className="sc-label">Day Streak</div>
-          </div>
-          <div className="summary-card">
-            <div className="sc-value">{completed} / {QUIZ_META.length}</div>
-            <div className="sc-label">Modules Attempted</div>
-          </div>
-          <div className="summary-card">
-            <div className="sc-value">{totalHS}</div>
-            <div className="sc-label">Total High Score</div>
-          </div>
-          <div className="summary-card">
-            <div className="sc-value">{QUIZ_META.length * TOTAL_QUESTIONS}</div>
-            <div className="sc-label">Total Questions</div>
-          </div>
+          <motion.div 
+            className="stat-card total"
+            whileHover={{ y: -5 }}
+          >
+            <div className="stat-label">Total Answers</div>
+            <div className="stat-value">{safeScoreData.totalQuestionsAnswered}</div>
+          </motion.div>
         </div>
 
-        {/* Per-module score cards */}
-        <div className="scores-grid">
-          {QUIZ_META.map((quiz) => {
-            const s        = moduleScores[quiz.key] ?? {};
-            const hs       = s.highScore  ?? 0;
-            const attempts = s.attempts   ?? 0;
-            const lastPlayed = s.lastPlayed ?? null;
-            const pct      = Math.round((hs / TOTAL_QUESTIONS) * 100);
-
-            return (
-              <div className="score-card" key={quiz.key}>
-                <div className="score-card-title">{quiz.label}</div>
-
-                <div className="score-row">
-                  <span className="sr-label">High Score</span>
-                  <span className="sr-value highlight">
-                    {hs} / {TOTAL_QUESTIONS}
-                  </span>
-                </div>
-
-                <div className="score-row">
-                  <span className="sr-label">Attempts</span>
-                  <span className="sr-value">{attempts}</span>
-                </div>
-
-                <div className="score-row">
-                  <span className="sr-label">Last Played</span>
-                  <span className="sr-value">{formatDate(lastPlayed)}</span>
-                </div>
-
-                {attempts === 0 ? (
-                  <p className="no-attempts">Not attempted yet</p>
-                ) : (
-                  <div className="score-progress">
-                    <div className="score-progress-fill" style={{ width: `${pct}%` }} />
+        {/* Module Performance List */}
+        <section className="modules-section">
+          <h2 className="modules-title">Quest Performance</h2>
+          
+          <div className="module-list">
+            {modules.map((mod, index) => {
+              // Calculate width percentage (cap at 100%)
+              const pct = Math.min(100, Math.max(0, (mod.data.highScore / MAX_MODULE_SCORE) * 100));
+              
+              return (
+                <motion.div 
+                  className="module-row" 
+                  key={mod.key}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <div className="mod-name">{mod.name}</div>
+                  <div className="mod-attempts">ATTEMPTS: <span className="font-mono">{mod.data.attempts}</span></div>
+                  <div className="mod-score">{mod.data.highScore}</div>
+                  <div className="mod-progress-bar">
+                    <motion.div 
+                      className="mod-progress-fill"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${pct}%` }}
+                      transition={{ duration: 1, delay: 0.5 + (index * 0.1) }}
+                    />
                   </div>
-                )}
-
-                <Link to={`/quiz/${quiz.key}`} className="quiz-btn">
-                  {attempts === 0 ? 'Start Quiz →' : 'Retake Quiz →'}
-                </Link>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Logout */}
-        <button className="logout-btn" onClick={handleLogout}>
-          Log Out
-        </button>
-      </div>
-    </div>
+                </motion.div>
+              );
+            })}
+          </div>
+          
+          <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+            <Link to="/quiz" className="btn-arcade primary">
+              RESUME QUESTS
+            </Link>
+          </div>
+        </section>
+      </motion.div>
+    </>
   );
 }

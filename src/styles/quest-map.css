@@ -1,0 +1,140 @@
+/* src/styles/quest-map.css */
+.quest-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-4);
+  text-align: center;
+  position: relative;
+}
+
+.quest-title {
+  font-family: var(--font-display);
+  font-size: var(--text-4xl);
+  color: var(--color-white);
+  margin-bottom: var(--space-2);
+  text-transform: uppercase;
+}
+
+.quest-subtitle {
+  font-family: var(--font-body);
+  font-size: var(--text-lg);
+  color: var(--color-white-muted);
+  margin-bottom: var(--space-12);
+}
+
+/* ── Vertical Timeline Path ── */
+.quest-path {
+  position: relative;
+  margin: 0 auto;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.quest-path::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  background-color: var(--color-void-light);
+  z-index: 0;
+  border-radius: var(--radius-pill);
+}
+
+/* ── Quest Nodes ── */
+.quest-node-wrapper {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.quest-node {
+  background-color: var(--color-surface);
+  border: 4px solid var(--color-ink);
+  border-radius: var(--radius-pill);
+  padding: var(--space-4) var(--space-8);
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-black);
+  color: var(--color-ink);
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: var(--shadow-arcade-md);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+.quest-node:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-arcade-growth);
+  border-color: var(--color-growth);
+  color: var(--color-void-dark);
+}
+
+.quest-node:active {
+  transform: translateY(2px);
+  box-shadow: 0px 2px 0px var(--color-growth-shadow);
+}
+
+/* Add alternating translation for visual interest */
+.quest-node-wrapper:nth-child(odd) .quest-node {
+  transform: translateX(-30px);
+}
+.quest-node-wrapper:nth-child(even) .quest-node {
+  transform: translateX(30px);
+}
+
+.quest-node-wrapper:nth-child(odd) .quest-node:hover {
+  transform: translate(-30px, -4px);
+}
+.quest-node-wrapper:nth-child(even) .quest-node:hover {
+  transform: translate(30px, -4px);
+}
+
+.quest-node-wrapper:nth-child(odd) .quest-node:active {
+  transform: translate(-30px, 2px);
+}
+.quest-node-wrapper:nth-child(even) .quest-node:active {
+  transform: translate(30px, 2px);
+}
+
+/* ── Icons inside nodes ── */
+.quest-icon {
+  background-color: var(--color-void);
+  color: var(--color-wealth);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-lg);
+  border: 2px solid var(--color-ink);
+}
+
+/* Mobile responsive */
+@media (max-width: 600px) {
+  .quest-path::before {
+    left: 20px;
+  }
+  .quest-node-wrapper {
+    justify-content: flex-start;
+    padding-left: 50px;
+  }
+  .quest-node-wrapper:nth-child(odd) .quest-node,
+  .quest-node-wrapper:nth-child(even) .quest-node {
+    transform: none !important;
+    min-width: 100%;
+  }
+}

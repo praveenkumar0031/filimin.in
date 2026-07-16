@@ -1,9 +1,15 @@
 // src/pages/learn/TaxPage.jsx
-import '../../styles/debt.css';
+import { Link } from 'react-router-dom';
+import Navbar from '../../components/Navbar';
+import '../../styles/learn.css';
 export default function TaxPage() {
   return (
     <>
-      <div className="head">
+      <Navbar />
+      <div className="article-container">
+        <Link to="/learn" className="btn-arcade" style={{ marginBottom: "2rem" }}>&larr; BACK TO MANUAL</Link>
+        <div className="article-content">
+          <div>
         <h2>What Is Tax?</h2>
         <p>
           A tax is a mandatory financial charge levied by a government on individuals or organizations
@@ -11,7 +17,7 @@ export default function TaxPage() {
           funding education, healthcare, defense, roads, and social programs.
         </p>
       </div>
-      <div className="head">
+      <div>
         <h2>Types of Taxes</h2>
         <ul>
           <li><strong>Income Tax</strong> — Levied on personal and business earnings.</li>
@@ -21,6 +27,9 @@ export default function TaxPage() {
           <li><strong>Corporate Tax</strong> — Tax on business profits.</li>
           <li><strong>Payroll Tax</strong> — Funds Social Security and Medicare.</li>
         </ul>
+      </div>
+    
+        </div>
       </div>
     </>
   );
