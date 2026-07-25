@@ -1,20 +1,20 @@
 // src/services/scoreService.js
-// All Firestore read/write logic for user scores, achievements, and daily challenges.
+// All RTDB read/write logic for user scores, achievements, and daily challenges.
 
 import {
-  doc,
-  setDoc,
-  getDoc,
-  updateDoc,
-  arrayUnion,
+  ref,
+  get,
+  set,
+  update,
   runTransaction,
   serverTimestamp,
-} from 'firebase/firestore';
+  child,
+} from 'firebase/database';
 import { db } from '../firebase';
 import { ACHIEVEMENTS } from '../data/achievements';
 import { getTodayChallenge, getTodayChallengeKey } from '../data/dailyChallenges';
 
-// ─── Firestore schema ────────────────────────────────────────────────────────
+// ─── RTDB schema ────────────────────────────────────────────────────────
 //
 //  users/{uid}
 //    displayName:      string
@@ -53,22 +53,20 @@ const emptyScores = () =>
 // Called once on successful registration.
 // ─────────────────────────────────────────────────────────────────────────────
 export async function createUserDocument(uid, displayName, email) {
-  const ref = doc(db, 'users', uid);
-  await setDoc(
-    ref,
-    {
-      displayName,
-      email,
-      streak:               0,
-      totalScore:           0,
-      lastActiveDate:       serverTimestamp(),
-      achievements:         [],
-      notifications:        [],
-      completedChallenges:  [],
-      scores:               emptyScores(),
-    },
-    { merge: true }
-  );
+  const userRef = ref(db, `users/${uid}`);
+  // We use update so we don't wipe out any pre-existing data if this is ever called twice,
+  // although it should only be called on registration.
+  await update(userRef, {
+    displayName,
+    email,
+    streak:               0,
+    totalScore:           0,
+    lastActiveDate:       serverTimestamp(),
+    achievements:         [],
+    notifications:        [],
+    completedChallenges:  [],
+    scores:               emptyScores(),
+  });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -100,14 +98,20 @@ export async function saveScore(uid, moduleKey, newScore) {
     return { newAchievements: [], challengeCompleted: false };
   }
 
-  const ref = doc(db, 'users', uid);
+  const userRef = ref(db, `users/${uid}`);
 
-  // Fetch current state before transaction (for achievement / challenge evaluation)
-  const snapBefore = await getDoc(ref);
+  // Fetch current state before transaction (for achievement / challenge evaluation).
+  let snapBefore;
+  try {
+    snapBefore = await get(userRef);
+  } catch (err) {
+    console.error('[scoreService.saveScore] Pre-read failed:', err.message);
+    throw err;
+  }
 
   // ── Handle brand-new user ───────────────────────────────────────────────
   if (!snapBefore.exists()) {
-    await setDoc(ref, {
+    await update(userRef, {
       displayName:          '',
       email:                '',
       streak:               1,
@@ -116,15 +120,21 @@ export async function saveScore(uid, moduleKey, newScore) {
       achievements:         [],
       notifications:        [],
       completedChallenges:  [],
-      scores: {
-        ...emptyScores(),
-        [moduleKey]: { highScore: newScore, attempts: 1, lastPlayed: serverTimestamp() },
-      },
+      [`scores/${moduleKey}`]: { highScore: newScore, attempts: 1, lastPlayed: serverTimestamp() },
     });
 
     // Evaluate initial achievements (e.g. "first_quiz")
-    const freshSnap = await getDoc(ref);
-    const newlyUnlocked = _checkAchievements({ ...freshSnap.data(), scores: { ...emptyScores(), [moduleKey]: { highScore: newScore } }, streak: 1, totalScore: newScore });
+    let freshSnap;
+    try {
+      freshSnap = await get(userRef);
+    } catch (err) {
+      console.error('[scoreService.saveScore] Post-create read failed:', err.message);
+      return { newAchievements: [], challengeCompleted: false };
+    }
+
+    const data = freshSnap.val();
+    const newlyUnlocked = _checkAchievements(data);
+    
     if (newlyUnlocked.length > 0) {
       const newNotifs = newlyUnlocked.map(a => ({
         id: `ach_${a.id}_${Date.now()}`,
@@ -134,9 +144,13 @@ export async function saveScore(uid, moduleKey, newScore) {
         read: false,
         createdAt: new Date().toISOString(),
       }));
-      await updateDoc(ref, {
-        achievements: arrayUnion(...newlyUnlocked.map(a => a.id)),
-        notifications: arrayUnion(...newNotifs),
+      
+      const achArray = data.achievements || [];
+      const notifArray = data.notifications || [];
+      
+      await update(userRef, {
+        achievements: [...achArray, ...newlyUnlocked.map(a => a.id)],
+        notifications: [...notifArray, ...newNotifs],
       });
     }
     return { newAchievements: newlyUnlocked, challengeCompleted: false };
@@ -146,15 +160,15 @@ export async function saveScore(uid, moduleKey, newScore) {
   let newAchievements = [];
   let challengeCompleted = false;
 
-  await runTransaction(db, async (tx) => {
-    const snap = await tx.get(ref);
-    const data = snap.data();
+  await runTransaction(userRef, (data) => {
+    if (!data) return data; // Wait for data to be non-null
+
     const existingScore = data.scores?.[moduleKey] ?? emptyModuleScore();
     const now = new Date();
 
     // ── Streak logic ────────────────────────────────────────────────────
     let newStreak = data.streak ?? 0;
-    const lastActive = data.lastActiveDate?.toDate?.() ?? null;
+    const lastActive = data.lastActiveDate ?? null; // For RTDB, serverTimestamp returns a number on read
     if (lastActive) {
       const lastDay = new Date(lastActive);
       lastDay.setHours(0, 0, 0, 0);
@@ -189,6 +203,9 @@ export async function saveScore(uid, moduleKey, newScore) {
 
     // ── Evaluate achievements ────────────────────────────────────────────
     const newlyUnlocked = _checkAchievements(projectedData);
+    // Since transaction runs multiple times, only capture the final run's newAchievements
+    // (This works because the transaction's returned value is committed, and JS closure 
+    // keeps the reference to newAchievements up to date for the caller)
     newAchievements = newlyUnlocked;
 
     // ── Evaluate daily challenge ─────────────────────────────────────────
@@ -224,27 +241,39 @@ export async function saveScore(uid, moduleKey, newScore) {
       });
     }
 
-    // ── Write everything in one transaction ──────────────────────────────
-    const updatePayload = {
-      [`scores.${moduleKey}.attempts`]:   existingScore.attempts + 1,
-      [`scores.${moduleKey}.lastPlayed`]: serverTimestamp(),
-      [`scores.${moduleKey}.highScore`]:  updatedHighScore,
-      streak:         newStreak,
-      totalScore:     newTotalScore + bonusXP,
-      lastActiveDate: serverTimestamp(),
-    };
-
+    // ── Apply updates to data object ─────────────────────────────────────
+    
+    // Arrays
+    const achArray = data.achievements || [];
     if (newlyUnlocked.length > 0) {
-      updatePayload.achievements = arrayUnion(...newlyUnlocked.map(a => a.id));
+      data.achievements = [...achArray, ...newlyUnlocked.map(a => a.id)];
     }
+    
+    const notifArray = data.notifications || [];
     if (newNotifs.length > 0) {
-      updatePayload.notifications = arrayUnion(...newNotifs);
+      data.notifications = [...notifArray, ...newNotifs];
     }
+    
+    const compArray = data.completedChallenges || [];
     if (challengeCompleted) {
-      updatePayload.completedChallenges = arrayUnion(challengeKey);
+      data.completedChallenges = [...compArray, challengeKey];
     }
 
-    tx.update(ref, updatePayload);
+    // Primitives & Objects
+    data.streak = newStreak;
+    data.totalScore = newTotalScore + bonusXP;
+    // We cannot use serverTimestamp() in a transaction update directly if we return the object.
+    // Instead we just use Date.now() for transactions.
+    data.lastActiveDate = Date.now(); 
+    
+    if (!data.scores) data.scores = {};
+    if (!data.scores[moduleKey]) data.scores[moduleKey] = emptyModuleScore();
+    
+    data.scores[moduleKey].attempts = existingScore.attempts + 1;
+    data.scores[moduleKey].highScore = updatedHighScore;
+    data.scores[moduleKey].lastPlayed = Date.now();
+
+    return data;
   });
 
   return { newAchievements, challengeCompleted };
@@ -254,17 +283,28 @@ export async function saveScore(uid, moduleKey, newScore) {
 // markNotificationsRead — called when bell tray is opened
 // ─────────────────────────────────────────────────────────────────────────────
 export async function markNotificationsRead(uid) {
-  const ref  = doc(db, 'users', uid);
-  const snap = await getDoc(ref);
-  if (!snap.exists()) return;
-  const notifs = (snap.data().notifications || []).map(n => ({ ...n, read: true }));
-  await updateDoc(ref, { notifications: notifs });
+  try {
+    const userRef = ref(db, `users/${uid}`);
+    const snap = await get(userRef);
+    if (!snap.exists()) return;
+    
+    const data = snap.val();
+    const notifs = (data.notifications || []).map(n => ({ ...n, read: true }));
+    await update(userRef, { notifications: notifs });
+  } catch (err) {
+    console.error('[scoreService.markNotificationsRead] failed:', err.message);
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // getUserData  (one-time fetch, for non-realtime use cases)
 // ─────────────────────────────────────────────────────────────────────────────
 export async function getUserData(uid) {
-  const snap = await getDoc(doc(db, 'users', uid));
-  return snap.exists() ? snap.data() : null;
+  try {
+    const snap = await get(ref(db, `users/${uid}`));
+    return snap.exists() ? snap.val() : null;
+  } catch (err) {
+    console.error('[scoreService.getUserData] failed:', err.message);
+    return null;
+  }
 }

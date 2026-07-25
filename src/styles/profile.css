@@ -409,6 +409,8 @@
   cursor: pointer;
   box-shadow: 0 4px 0 var(--color-risk-shadow);
   transition: transform 0.1s ease, box-shadow 0.1s ease;
+  /* Minimum 44px touch target */
+  min-height: 44px;
 }
 
 .btn-danger:hover {
@@ -426,7 +428,7 @@
   color: var(--color-white);
 }
 
-/* ── Modal Overlay ─────────────────────────────────────────────────────── */
+/* ── Modal Overlay ──────────────────────────────────────────────────────── */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -434,8 +436,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  /* Use canonical modal layer — above navbar, drawer, and dropdowns */
+  z-index: var(--z-modal);
   padding: var(--space-4);
+  /* Allow the overlay itself to scroll on tiny screens */
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .modal-card {
@@ -445,6 +451,9 @@
   padding: var(--space-8);
   max-width: 420px;
   width: 100%;
+  /* Constrain card height so it never overflows the viewport */
+  max-height: calc(100vh - var(--space-8) * 2);
+  overflow-y: auto;
   box-shadow: 0 8px 0 var(--color-risk-shadow);
   text-align: center;
 }

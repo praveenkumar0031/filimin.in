@@ -5,8 +5,8 @@ import Navbar from '../components/Navbar';
 import { LEARN_TOPICS } from '../data/learnTopics';
 import '../styles/learn.css';
 
-// motion() wraps Link so Framer Motion can animate it
-const MotionLink = motion(Link);
+// motion.create wraps Link so Framer Motion can animate it
+const MotionLink = motion.create(Link);
 
 export default function LearnPage() {
   const { pathname } = useLocation();

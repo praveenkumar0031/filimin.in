@@ -1,5 +1,6 @@
-/* src/styles/navbar.css - Comprehensive & Responsive */
+/* src/styles/navbar.css — Structural & accessibility fixes applied */
 
+/* ── Sticky bar ──────────────────────────────────────────────────────── */
 .navbar {
   display: flex;
   align-items: center;
@@ -9,16 +10,18 @@
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
   position: sticky;
   top: 0;
-  z-index: 100;
+  /* Use canonical z-index: sits above page content, below dropdowns/modals */
+  z-index: var(--z-sticky);
   border-bottom: 2px solid var(--color-void-dark);
 }
 
+/* ── Logo ────────────────────────────────────────────────────────────── */
 .nav-logo {
   display: flex;
   align-items: center;
   gap: var(--space-3);
   text-decoration: none;
-  z-index: 101; /* Stay above mobile menu */
+  /* No z-index needed — stays in normal stacking order within navbar */
 }
 
 .nav-logo img {
@@ -35,7 +38,7 @@
   letter-spacing: 1px;
 }
 
-/* Desktop Links */
+/* ── Desktop Links ───────────────────────────────────────────────────── */
 .nav-links-desktop {
   display: flex;
   align-items: center;
@@ -49,9 +52,11 @@
   color: var(--color-surface);
   text-transform: uppercase;
   letter-spacing: 1px;
+  /* Minimum 44px tap target */
+  min-height: 44px;
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-pill);
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease;
   display: flex;
   align-items: center;
   gap: var(--space-2);
@@ -68,44 +73,50 @@
   box-shadow: 0 0 12px rgba(0, 240, 152, 0.15);
 }
 
-/* User Actions (Logout) */
+/* ── User Actions (Logout button) ────────────────────────────────────── */
 .nav-action-btn {
   background: transparent;
   border: 1px solid var(--color-risk);
   color: var(--color-risk);
   cursor: pointer;
 }
+
 .nav-action-btn:hover {
   background: var(--color-risk);
   color: var(--color-white);
 }
 
-/* Hamburger Icon */
+/* ── Hamburger ───────────────────────────────────────────────────────── */
 .mobile-menu-btn {
   display: none;
   background: transparent;
   border: none;
   color: var(--color-white);
   cursor: pointer;
-  z-index: 101;
+  /* Must sit above the drawer so tap closes it cleanly */
+  z-index: calc(var(--z-drawer) + 10);
   padding: var(--space-2);
+  /* Minimum touch target */
+  min-width: 44px;
+  min-height: 44px;
 }
 
-/* Mobile Drawer */
+/* ── Mobile Drawer ───────────────────────────────────────────────────── */
 .mobile-drawer {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;                     /* top/right/bottom/left: 0 — replaces explicit coordinates */
   background-color: var(--color-ink);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   gap: var(--space-6);
-  z-index: 100;
+  /* Drawer sits above sticky navbar */
+  z-index: var(--z-drawer);
   padding: var(--space-8);
+  /* Allow internal scroll if many nav items are added */
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .mobile-drawer .nav-item {
@@ -113,33 +124,32 @@
   padding: var(--space-3) var(--space-6);
 }
 
-/* Responsive Breakpoints */
-@media (max-width: 768px) {
-  .navbar {
-    padding: var(--space-3) var(--space-4);
-  }
-  
-  .nav-links-desktop {
-    display: none; /* Hide desktop links on small screens */
-  }
-  
-  .mobile-menu-btn {
-    display: flex; /* Show hamburger */
-    align-items: center;
-    justify-content: center;
-  }
-}
-
 /* ── Notification Bell (desktop) ─────────────────────────────────────── */
 .nav-bell-desktop {
   display: flex;
   align-items: center;
   margin-left: var(--space-2);
+  /* Position context for the tray dropdown */
+  position: relative;
 }
 
+/* ── Responsive ──────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
+  .navbar {
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .nav-links-desktop {
+    display: none;
+  }
+
   .nav-bell-desktop {
     display: none;
   }
-}
 
+  .mobile-menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}

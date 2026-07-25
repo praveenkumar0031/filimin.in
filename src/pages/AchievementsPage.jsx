@@ -3,7 +3,7 @@
 // Fetches user's unlocked achievement IDs from Firestore once on mount.
 
 import { useState, useEffect } from 'react';
-import { doc, getDoc } from 'firebase/firestore';
+import { ref, get, child } from 'firebase/database';
 import { db } from '../firebase';
 import { useAuth } from '../context/AuthContext';
 import { ACHIEVEMENTS } from '../data/achievements';
@@ -19,11 +19,20 @@ export default function AchievementsPage() {
   useEffect(() => {
     if (!user) { setLoading(false); return; }
     (async () => {
-      const snap = await getDoc(doc(db, 'users', user.uid));
-      if (snap.exists()) {
-        setUnlocked(snap.data().achievements || []);
+      try {
+        const snap = await get(child(ref(db), `users/${user.uid}`));
+        if (snap.exists()) {
+          setUnlocked(snap.val().achievements || []);
+        }
+      } catch (err) {
+        // Firestore can throw "client is offline" if the network is unavailable
+        // or if the Firebase config is misconfigured.  We log the real error so
+        // it is visible in DevTools, and the page still renders (just with locked
+        // state for all badges until the connection recovers).
+        console.error('[AchievementsPage] Firestore read failed:', err.code, err.message);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     })();
   }, [user]);
 

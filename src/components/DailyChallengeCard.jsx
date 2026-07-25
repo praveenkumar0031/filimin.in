@@ -3,7 +3,7 @@
 // Fetches user's completedChallenges from Firestore once on mount.
 
 import { useState, useEffect } from 'react';
-import { doc, getDoc } from 'firebase/firestore';
+import { ref, get, child } from 'firebase/database';
 import { db } from '../firebase';
 import { useAuth } from '../context/AuthContext';
 import { getTodayChallenge, getTodayChallengeKey } from '../data/dailyChallenges';
@@ -24,6 +24,7 @@ export default function DailyChallengeCard() {
   const { user } = useAuth();
   const [done, setDone]       = useState(false);
   const [loading, setLoading] = useState(true);
+  const [fetchErr, setFetchErr] = useState(false);
 
   const challenge    = getTodayChallenge();
   const challengeKey = getTodayChallengeKey();
@@ -31,12 +32,18 @@ export default function DailyChallengeCard() {
   useEffect(() => {
     if (!user) { setLoading(false); return; }
     (async () => {
-      const snap = await getDoc(doc(db, 'users', user.uid));
-      if (snap.exists()) {
-        const completed = snap.data().completedChallenges || [];
-        setDone(completed.includes(challengeKey));
+      try {
+        const snap = await get(child(ref(db), `users/${user.uid}`));
+        if (snap.exists()) {
+          const completed = snap.val().completedChallenges || [];
+          setDone(completed.includes(challengeKey));
+        }
+      } catch (err) {
+        console.error('[DailyChallengeCard] Firestore read failed:', err.code, err.message);
+        setFetchErr(true);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     })();
   }, [user, challengeKey]);
 

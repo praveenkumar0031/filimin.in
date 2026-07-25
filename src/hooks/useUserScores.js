@@ -4,7 +4,7 @@
 // Returns { scores, loading, error }.
 
 import { useState, useEffect } from 'react';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { ref, onValue } from 'firebase/database';
 import { db } from '../firebase';
 
 export function useUserScores(uid) {
@@ -18,14 +18,14 @@ export function useUserScores(uid) {
       return;
     }
 
-    const ref = doc(db, 'users', uid);
+    const userRef = ref(db, `users/${uid}`);
 
     // Subscribe to real-time updates
-    const unsubscribe = onSnapshot(
-      ref,
+    const unsubscribe = onValue(
+      userRef,
       (snap) => {
         if (snap.exists()) {
-          setScores(snap.data());
+          setScores(snap.val());
         } else {
           setScores(null);
         }

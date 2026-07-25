@@ -1,0 +1,133 @@
+/* src/styles/global-fixes.css
+ * ─────────────────────────────────────────────────────────────────────────
+ * Structural, scroll, and accessibility fixes.
+ * Load this file AFTER theme.css and BEFORE all component stylesheets.
+ * DO NOT change colors, typography, or layout concept.
+ * ─────────────────────────────────────────────────────────────────────────
+ */
+
+/* ══════════════════════════════════════════════════════════════════════════
+   1. BOX MODEL — prevent horizontal overflow site-wide
+   ══════════════════════════════════════════════════════════════════════════ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  /* Smooth anchor scrolling */
+  scroll-behavior: smooth;
+  /* Prevent horizontal scroll from rogue elements */
+  overflow-x: hidden;
+}
+
+body {
+  overflow-x: hidden;
+  /* Ensure the body never horizontally scrolls */
+  max-width: 100vw;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   2. Z-INDEX SCALE — one canonical layer map, no more magic numbers
+      base        0
+      sticky     100   ← navbar
+      dropdown   200   ← notification tray, nav dropdowns
+      drawer     300   ← mobile drawer
+      modal      400   ← confirm modals
+      toast      500   ← floating score numbers, toasts
+   ══════════════════════════════════════════════════════════════════════════ */
+:root {
+  --z-base:     0;
+  --z-sticky:   100;
+  --z-dropdown: 200;
+  --z-drawer:   300;
+  --z-modal:    400;
+  --z-toast:    500;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   3. GLOBAL FOCUS RING — visible on every interactive element
+      Replaced by a custom ring instead of relying on browser default
+      (which many CSS resets strip out).
+   ══════════════════════════════════════════════════════════════════════════ */
+:focus-visible {
+  outline: 3px solid var(--color-wealth);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Remove default outline only when focus-visible is supported */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   4. REDUCED MOTION — gate ALL transitions/animations behind this query.
+      Each animation/transition is reduced here; nothing is fully deleted.
+   ══════════════════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   5. SKIP-TO-CONTENT link (keyboard accessibility)
+   ══════════════════════════════════════════════════════════════════════════ */
+.skip-to-content {
+  position: absolute;
+  top: -999px;
+  left: 0;
+  padding: var(--space-3) var(--space-6);
+  background-color: var(--color-wealth);
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  z-index: var(--z-toast);
+  text-decoration: none;
+  border-radius: 0 0 var(--radius-md) 0;
+}
+
+.skip-to-content:focus {
+  top: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   6. IMAGES — prevent img from breaking out of containers
+   ══════════════════════════════════════════════════════════════════════════ */
+img, video, iframe {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   7. FLEX/GRID SCROLL CHILDREN — the most common cause of flex children
+      not scrolling is missing min-height: 0 / min-width: 0.
+      Apply to any component that is a flex child and should scroll.
+   ══════════════════════════════════════════════════════════════════════════ */
+.scroll-child {
+  min-height: 0;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   8. VISUALLY HIDDEN utility (screen-reader text)
+   ══════════════════════════════════════════════════════════════════════════ */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}

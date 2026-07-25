@@ -97,14 +97,23 @@ export default function QuizPage() {
 
   const isFinished = questions.length > 0 && currentIdx === questions.length - 1 && isAnswered;
 
+  const [saveError, setSaveError] = useState(null);
+
   useEffect(() => {
     if (isFinished && user) {
-      const saveScore = async () => {
+      const doSave = async () => {
         setIsSaving(true);
-        await updateModuleScore(user.uid, moduleKey, score);
-        setIsSaving(false);
+        setSaveError(null);
+        try {
+          await updateModuleScore(user.uid, moduleKey, score);
+        } catch (err) {
+          console.error('[QuizPage] Score save failed:', err.code, err.message);
+          setSaveError('Score could not be saved — connection issue. Your quiz is done but the score was not recorded. Try again on Dashboard.');
+        } finally {
+          setIsSaving(false);
+        }
       };
-      saveScore();
+      doSave();
     }
   }, [isFinished, user, moduleKey, score]);
 
@@ -118,7 +127,7 @@ export default function QuizPage() {
       <div className="quiz-layout">
         <Navbar />
         <div className="quiz-playfield">
-          <motion.div 
+          <motion.div
             className="results-card"
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -127,8 +136,24 @@ export default function QuizPage() {
             <h2>QUEST COMPLETE</h2>
             <div className="ticker-label">Final Wealth</div>
             <div className="results-score"><AnimatedCounter value={score} /></div>
-            
-            <button 
+
+            {saveError && (
+              <div style={{
+                background: 'var(--color-risk)',
+                color: 'white',
+                padding: '0.75rem 1rem',
+                borderRadius: '8px',
+                fontSize: 'var(--text-sm)',
+                fontFamily: 'var(--font-body)',
+                marginTop: '1rem',
+                marginBottom: '0.5rem',
+                textAlign: 'left',
+              }}>
+                ⚠ {saveError}
+              </div>
+            )}
+
+            <button
               className="btn-arcade primary"
               onClick={() => navigate('/dashboard')}
               disabled={isSaving}

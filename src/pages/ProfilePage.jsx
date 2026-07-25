@@ -7,13 +7,11 @@
 // - Account settings (display name update)
 // - Danger zone (logout, reset, delete account)
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import {
-  doc, getDoc, updateDoc, deleteDoc, setDoc, serverTimestamp
-} from 'firebase/firestore';
-import { signOut, deleteUser, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
+import { ref, get, child, update, remove } from 'firebase/database';
+import { signOut, deleteUser } from 'firebase/auth';
 import { auth, db } from '../firebase';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from '../components/Navbar';
@@ -67,24 +65,64 @@ function SkeletonProfile() {
 }
 
 // ── Confirmation Modal ─────────────────────────────────────────────────────
-function ConfirmModal({ title, message, confirmLabel, onConfirm, onCancel, dangerous }) {
+function ConfirmModal({ title, message, confirmLabel, onConfirm, onCancel, dangerous, triggerId }) {
+  const cardRef = useRef(null);
+
+  // Focus first button on open
+  useEffect(() => {
+    const firstBtn = cardRef.current?.querySelector('button');
+    firstBtn?.focus();
+  }, []);
+
+  // Escape key closes modal and returns focus to trigger
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'Escape') onCancel();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [onCancel]);
+
+  // Focus trap inside modal
+  const handleKeyDown = (e) => {
+    if (e.key !== 'Tab') return;
+    const focusables = Array.from(
+      cardRef.current?.querySelectorAll('button, [href], input, [tabindex]:not([tabindex="-1"])') || []
+    );
+    if (!focusables.length) return;
+    const first = focusables[0];
+    const last  = focusables[focusables.length - 1];
+    if (e.shiftKey) {
+      if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+    } else {
+      if (document.activeElement === last)  { e.preventDefault(); first.focus(); }
+    }
+  };
+
   return (
     <motion.div
       className="modal-overlay"
+      role="presentation"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       onClick={onCancel}
     >
       <motion.div
+        ref={cardRef}
         className="modal-card"
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
+        aria-describedby="modal-desc"
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.8, opacity: 0 }}
         onClick={(e) => e.stopPropagation()}
+        onKeyDown={handleKeyDown}
       >
-        <h3>{title}</h3>
-        <p>{message}</p>
+        <h3 id="modal-title">{title}</h3>
+        <p id="modal-desc">{message}</p>
         <div className="modal-actions">
           <button className="btn-danger" onClick={onCancel}>Cancel</button>
           <button
@@ -105,23 +143,30 @@ export default function ProfilePage() {
 
   const [data, setData]               = useState(null);
   const [loading, setLoading]         = useState(true);
+  const [fetchError, setFetchError]   = useState(null);
   const [displayName, setDisplayName] = useState('');
   const [saving, setSaving]           = useState(false);
   const [feedback, setFeedback]       = useState(null); // { type: 'success'|'error', msg }
 
   const [modal, setModal] = useState(null); // 'reset' | 'delete' | null
 
-  // ── Fetch Firestore document ─────────────────────────────────────────
+  // ── Fetch Firestore document ─────────────────────────────────────────────────
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const snap = await getDoc(doc(db, 'users', user.uid));
-      if (snap.exists()) {
-        const d = snap.data();
-        setData(d);
-        setDisplayName(d.displayName || '');
+      try {
+        const snap = await get(child(ref(db), `users/${user.uid}`));
+        if (snap.exists()) {
+          const d = snap.val();
+          setData(d);
+          setDisplayName(d.displayName || '');
+        }
+      } catch (err) {
+        console.error('[ProfilePage] Firestore read failed:', err.code, err.message);
+        setFetchError('Connection issue — could not load your profile. Check your internet and refresh.');
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     })();
   }, [user]);
 
@@ -175,7 +220,7 @@ export default function ProfilePage() {
     setSaving(true);
     setFeedback(null);
     try {
-      await updateDoc(doc(db, 'users', user.uid), { displayName: displayName.trim() });
+      await update(ref(db, `users/${user.uid}`), { displayName: displayName.trim() });
       setData(prev => ({ ...prev, displayName: displayName.trim() }));
       setFeedback({ type: 'success', msg: '✔ PLAYER TAG UPDATED SUCCESSFULLY.' });
     } catch {
@@ -191,11 +236,10 @@ export default function ProfilePage() {
 
   const handleResetProgress = async () => {
     setModal(null);
-    // Reset scores and totalScore to zero, keep profile info
-    const emptyScores = Object.fromEntries(
-      MODULES.map(m => [m.key, { highScore: 0, attempts: 0, lastPlayed: null }])
-    );
-    await updateDoc(doc(db, 'users', user.uid), {
+    const emptyModuleScore = { highScore: 0, attempts: 0, lastPlayed: null };
+    const emptyScores = Object.fromEntries(MODULES.map(m => [m.key, emptyModuleScore]));
+    
+    await update(ref(db, `users/${user.uid}`), {
       scores: emptyScores,
       totalScore: 0,
       streak: 0,
@@ -207,7 +251,7 @@ export default function ProfilePage() {
   const handleDeleteAccount = async () => {
     setModal(null);
     try {
-      await deleteDoc(doc(db, 'users', user.uid));
+      await remove(ref(db, `users/${user.uid}`));
       await deleteUser(user);
       navigate('/');
     } catch (err) {
@@ -221,6 +265,26 @@ export default function ProfilePage() {
       <Navbar />
       <div className="profile-page">
         <SkeletonProfile />
+      </div>
+    </>
+  );
+
+  if (fetchError) return (
+    <>
+      <Navbar />
+      <div className="profile-page" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+        <div className="profile-section" style={{ maxWidth: 480, padding: '2rem', textAlign: 'center' }}>
+          <p style={{ fontSize: '2rem' }}>⚡</p>
+          <p style={{ fontFamily: 'var(--font-display)', color: 'var(--color-risk)', fontWeight: 700, marginBottom: '0.5rem' }}>
+            CONNECTION ISSUE
+          </p>
+          <p style={{ color: 'var(--color-ink-light)', fontSize: 'var(--text-sm)' }}>
+            {fetchError}
+          </p>
+          <button className="btn-arcade primary" style={{ marginTop: '1rem' }} onClick={() => window.location.reload()}>
+            RETRY
+          </button>
+        </div>
       </div>
     </>
   );
@@ -316,10 +380,20 @@ export default function ProfilePage() {
                   return (
                     <div key={key} className="progress-item">
                       <div className="progress-item-header">
-                        <span className="progress-item-label">{emoji} {label}</span>
+                        <span className="progress-item-label" id={`prog-label-${key}`}>
+                          <span aria-hidden="true">{emoji}</span> {label}
+                        </span>
                         <span className="progress-item-score">{hs} / {MAX_SCORE_PER_MODULE} pts</span>
                       </div>
-                      <div className="progress-track">
+                      <div
+                        className="progress-track"
+                        role="progressbar"
+                        aria-valuenow={pct}
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                        aria-labelledby={`prog-label-${key}`}
+                        aria-valuetext={`${hs} out of ${MAX_SCORE_PER_MODULE} points — ${pct}%`}
+                      >
                         <motion.div
                           className="progress-fill"
                           initial={{ width: 0 }}

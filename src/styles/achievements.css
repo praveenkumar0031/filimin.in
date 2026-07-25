@@ -51,7 +51,7 @@
   gap: var(--space-4);
 }
 
-/* ── Card ────────────────────────────────────────────────────────────── */
+/* ── Card ───────────────────────────────────────────────────────── */
 .achievement-card {
   background-color: var(--color-surface);
   border: 4px solid var(--color-void-dark);
@@ -65,6 +65,8 @@
   gap: var(--space-3);
   position: relative;
   overflow: hidden;
+  /* Cards are visually interactive — ensure keyboard users can focus them */
+  outline-offset: 4px;
 }
 
 .achievement-card.unlocked {
@@ -74,8 +76,11 @@
 }
 
 .achievement-card.locked {
-  opacity: 0.55;
-  filter: grayscale(60%);
+  /* Raised from 0.55 to 0.65 — still visually distinct but meets WCAG AA
+   * for the card title/desc text (#090426 on #F4F2FF = 16:1 contrast at full opacity,
+   * still ~10:1 at 0.65 — well above the 4.5:1 AA threshold). */
+  opacity: 0.65;
+  filter: grayscale(50%);
 }
 
 .achievement-emoji {
